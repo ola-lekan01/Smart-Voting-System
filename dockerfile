@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk
+FROM adoptopenjdk:17-jdk-hotspot as builder
 
 WORKDIR /app
 
@@ -11,6 +11,14 @@ COPY src ./src
 
 RUN ./mvnw dependency:resolve
 
-EXPOSE 8080
+FROM adoptopenjdk:17-jre-hotspot
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the JAR file from the builder stage to the runtime stage
+COPY --from=builder /app/target/myapp.jar .
+
+EXPOSE ${PORT}
 
 CMD ["./mvnw", "spring-boot:run"]
