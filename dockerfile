@@ -4,8 +4,13 @@ WORKDIR /app
 
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-RUN ./mvnw dependency:resolve
+
+RUN chmod +x mvnw
 
 COPY src ./src
+
+RUN ./mvnw dependency:resolve
+
+EXPOSE 8080
 
 CMD ["./mvnw", "spring-boot:run"]
