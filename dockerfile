@@ -1,4 +1,4 @@
-FROM adoptopenjdk:17-jdk-hotspot as builder
+FROM maven:3.8.3-openjdk-17 AS build
 
 WORKDIR /app
 
