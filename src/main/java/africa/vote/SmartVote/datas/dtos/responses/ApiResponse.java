@@ -1,4 +1,4 @@
-package africa.vote.SmartVote.dtos.responses;
+package africa.vote.SmartVote.datas.dtos.responses;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

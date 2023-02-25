@@ -1,6 +1,6 @@
 package africa.vote.SmartVote.controllers;
 
-import africa.vote.SmartVote.dtos.responses.ApiResponse;
+import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("")
-public class Sample {
+public class SampleController {
     @GetMapping("")
     public ResponseEntity<?> mainPage(HttpServletRequest httpServletRequest)  {
 
