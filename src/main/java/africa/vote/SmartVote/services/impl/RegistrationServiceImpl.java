@@ -1,6 +1,7 @@
 package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.RegistrationRequest;
+import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
 import africa.vote.SmartVote.datas.enums.Category;
 import africa.vote.SmartVote.datas.enums.Status;
 import africa.vote.SmartVote.datas.models.Users;
@@ -25,11 +26,14 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .phoneNumber(registrationRequest.getPhoneNumber())
                 .email(registrationRequest.getEmail())
                 .imageUrl(registrationRequest.getImageUrl())
-                .password(registrationRequest.getPassword())
+                .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .category(Category.COHORT12)
                 .status(Status.UNVERIFIED)
                 .build();
         Users savedUser = userService.saveUser(users);
-
+        SendotpRequest otpRequest = new SendotpRequest();
+        otpRequest.setEmail(registrationRequest.getEmail());
+        userService.sendOTP(otpRequest);
+        return "User Registration successful";
     }
 }
