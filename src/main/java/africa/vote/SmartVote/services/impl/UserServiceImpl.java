@@ -72,8 +72,8 @@ public class UserServiceImpl implements UserService {
                 orElseThrow(() -> new GenericException("Token doesn't exist"));
 
         if(foundOtPtoken.getExpiredTime().isBefore(Instant.now())) throw new GenericException("OTP already expired");
-        if(foundOtPtoken.getConfirmedTime() != null) throw  new GenericException("OTP has already been used");
-        if(!Objects.equals(otpVerificationRequest.getToken(), foundOtPtoken.getToken())) throw  new GenericException("OTP isn't correct");
+        if(foundOtPtoken.getConfirmedTime() != null) throw new GenericException("OTP has already been used");
+        if(!Objects.equals(otpVerificationRequest.getToken(), foundOtPtoken.getToken())) throw new GenericException("OTP isn't correct");
         tokenRepository.setConfirmedAt(Instant.now(), otpVerificationRequest.getToken());
         return "Confirmed";
     }
