@@ -23,9 +23,6 @@ public class RegistrationRequest {
     @Column(name = "phone_number", nullable = false, length = 100)
     private String phoneNumber;
     private String password;
-    @Column(name = "status", nullable = false, length = 100)
-    @Enumerated(EnumType.STRING)
-    private Status status;
     @Enumerated(EnumType.ORDINAL)
     private Category category;
     private String imageUrl;
