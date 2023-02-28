@@ -1,21 +1,22 @@
 package africa.vote.SmartVote.services.impl;
 
-import africa.vote.SmartVote.datas.dtos.requests.OTPVerificationRequest;
-import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
+import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
+import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
+import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.enums.Status;
-import africa.vote.SmartVote.datas.models.OTPtoken;
-import africa.vote.SmartVote.datas.models.Users;
+import africa.vote.SmartVote.datas.models.Token;
+import africa.vote.SmartVote.datas.models.User;
 import africa.vote.SmartVote.datas.repositories.TokenRepository;
 import africa.vote.SmartVote.datas.repositories.UserRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
+import africa.vote.SmartVote.security.config.JWTService;
 import africa.vote.SmartVote.services.EmailService;
 import africa.vote.SmartVote.services.UserService;
 import africa.vote.SmartVote.utils.TokenGenerator;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,63 +24,83 @@ import static africa.vote.SmartVote.utils.EmailUtils.buildEmail;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
+    private final EmailService emailService;
+    private final JWTService jwtService;
+
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TokenRepository tokenRepository;
-    @Autowired
-    private EmailService emailService;
+    public UserServiceImpl(UserRepository userRepository, TokenRepository tokenRepository,
+                           EmailService emailService, JWTService jwtService) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.emailService = emailService;
+        this.jwtService = jwtService;
+    }
+
     @Override
-    public Users saveUser(Users user) {
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    public String createAccount(OTPVerificationRequest otpVerificationRequest) {
-        OTPVerification(otpVerificationRequest);
-        userRepository.verifyUser(Status.VERIFIED, otpVerificationRequest.getEmail());
-        return "User verification successful";
+    public ApiData createAccount(TokenRequest tokenRequest) {
+        OTPVerification(tokenRequest);
+        userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
+        var foundUser = getByEmailAddress(tokenRequest.getEmail())
+                .orElseThrow(() -> new GenericException("User Not found"));
+        return ApiData.builder()
+                .data(jwtService.generateToken(foundUser))
+                .build();
     }
 
     @Override
-    public String sendOTP(SendotpRequest sendotpRequest) {
-        Users users = userRepository.findByEmailIgnoreCase(sendotpRequest.getEmail()).orElseThrow(() -> new GenericException("user with " + sendotpRequest.getEmail() + " doesn't exist"));
-        return otpTokenGeneration(sendotpRequest, users);
+    public ApiData sendOTP(ResendTokenRequest resendTokenRequest) {
+        User user = userRepository.findByEmailIgnoreCase(resendTokenRequest.getEmail())
+                .orElseThrow(() -> new GenericException
+                        ("user with " + resendTokenRequest.getEmail() + " doesn't exist"));
+        return otpTokenGeneration(resendTokenRequest, user);
     }
 
     @Override
-    public String otpTokenGeneration(SendotpRequest sendotpRequest, Users savedUser) {
-        String generateToken = TokenGenerator.generaToken();
+    public ApiData otpTokenGeneration(ResendTokenRequest resendTokenRequest, User savedUser) {
+        final String generateToken = TokenGenerator.generaToken();
+        var token = new Token(generateToken, savedUser);
 
-        OTPtoken otPtoken = new OTPtoken(generateToken, Instant.now(), Instant.now().plusSeconds(600), savedUser);
-        var foundUserOTP = tokenRepository.findOTPtokenById(savedUser.getId());
-        if(Objects.isNull(foundUserOTP)) tokenRepository.save(otPtoken);
+        var foundUserOTP = tokenRepository.findById(savedUser.getId())
+                .orElseThrow(()-> new GenericException("Token does not Exist!!!"));
+        if(Objects.isNull(foundUserOTP)) tokenRepository.save(token);
+
         else{
-            var foundToken = tokenRepository.findById(savedUser.getId()).orElseThrow(() -> new GenericException("Token doesn't exist"));
-            foundToken.setToken(generateToken);
-            foundToken.setCreatedTime(Instant.now());
-            foundToken.setConfirmedTime(Instant.now().plusSeconds(600));
-            foundToken.setUser(savedUser);
-            tokenRepository.save(foundToken);
+            foundUserOTP.setToken(generateToken);
+            foundUserOTP.setCreatedTime(LocalDateTime.now());
+            foundUserOTP.setConfirmedTime(LocalDateTime.now().plusMinutes(10));
+            foundUserOTP.setUser(savedUser);
+            tokenRepository.save(foundUserOTP);
         }
-        emailService.sendEmail(sendotpRequest.getEmail(), buildEmail(savedUser.getFirstName(), generateToken));
-        return "Token successfully sent to your email, please confirm now!!!";
+        emailService.sendEmail(resendTokenRequest.getEmail(),
+                buildEmail(savedUser.getFirstName(), generateToken));
+        return ApiData.builder()
+                .data("Token Sent")
+                .build();
     }
 
     @Override
-    public String OTPVerification(OTPVerificationRequest otpVerificationRequest) {
-        OTPtoken foundOtPtoken = tokenRepository.findOTPtokenByToken(otpVerificationRequest.getToken()).
+    public ApiData OTPVerification(TokenRequest tokenRequest) {
+        Token foundToken = tokenRepository.findByToken(tokenRequest.getToken()).
                 orElseThrow(() -> new GenericException("Token doesn't exist"));
 
-        if(foundOtPtoken.getExpiredTime().isBefore(Instant.now())) throw new GenericException("OTP already expired");
-        if(foundOtPtoken.getConfirmedTime() != null) throw new GenericException("OTP has already been used");
-        if(!Objects.equals(otpVerificationRequest.getToken(), foundOtPtoken.getToken())) throw new GenericException("OTP isn't correct");
-        tokenRepository.setConfirmedAt(Instant.now(), otpVerificationRequest.getToken());
-        return "Confirmed";
+        if(foundToken.getExpiredTime().isBefore(LocalDateTime.now())) throw new GenericException("OTP already expired");
+        if(foundToken.getConfirmedTime() != null) throw new GenericException("OTP has already been used");
+        if(!Objects.equals(tokenRequest.getToken(), foundToken.getToken())) throw new GenericException("OTP isn't correct");
+        tokenRepository.setConfirmedAt(LocalDateTime.now(), foundToken.getId());
+        return ApiData.builder()
+                .data("Confirmed")
+                .build();
     }
 
     @Override
-    public Optional<Users> getByEmailAddress(String email) {
+    public Optional<User> getByEmailAddress(String email) {
         return userRepository.findByEmailIgnoreCase(email);
     }
 }

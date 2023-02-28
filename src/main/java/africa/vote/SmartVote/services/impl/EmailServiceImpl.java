@@ -3,6 +3,7 @@ package africa.vote.SmartVote.services.impl;
 import africa.vote.SmartVote.services.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -15,10 +16,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
+
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
+
     @Async
     @Override
     public void sendEmail(String receiverMail, String email) {
@@ -32,10 +35,8 @@ public class EmailServiceImpl implements EmailService {
             javaMailSender.send(mailMessage);
             System.out.println("Mail sent successfully");
         } catch (MessagingException e) {
-            log.info("Problem: " + e.getMessage());
             throw new RuntimeException();
         } catch (MailException e) {
-            log.info("Problem 2: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
