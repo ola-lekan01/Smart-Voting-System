@@ -1,6 +1,6 @@
 package africa.vote.SmartVote.datas.models;
 
-import africa.vote.SmartVote.datas.enums.Category;
+import africa.vote.SmartVote.datas.enums.Cohort;
 import africa.vote.SmartVote.datas.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -28,11 +28,10 @@ public class Users {
     @Column(name="email", nullable = false, length = 100)
     @Email(message = "This field requires a valid email address")
     private String email;
-    @Column(name = "status", nullable = false, length = 100)
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Enumerated(EnumType.ORDINAL)
-    private Category category;
+    @Enumerated(EnumType.STRING)
+    private Cohort cohort;
     private String imageUrl;
     @JsonIgnore
     private String password;

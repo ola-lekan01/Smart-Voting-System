@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByEmailIgnoreCase(String email);
     @Modifying
     @Query("UPDATE Users users " +
-            "SET users.status = ?1" +
+            "SET users.status = ?1 " +
             "WHERE users.email = ?2")
     void verifyUser(Status verify, String email);
 }

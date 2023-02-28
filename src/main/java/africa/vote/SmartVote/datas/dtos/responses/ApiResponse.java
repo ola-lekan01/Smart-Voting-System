@@ -15,7 +15,6 @@ public class ApiResponse {
     @JsonFormat(pattern = "yyyy-MM-dd || HH:mm:ss")
     private ZonedDateTime timestamp;
     private HttpStatus status;
-    private int statusCode;
     private Object data;
     private String path;
     private boolean isSuccessful;

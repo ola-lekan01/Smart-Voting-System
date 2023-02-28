@@ -1,8 +1,8 @@
 package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.OTPVerificationRequest;
+import africa.vote.SmartVote.datas.dtos.requests.ResendOtpRequest;
 import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
-import africa.vote.SmartVote.datas.enums.Status;
 import africa.vote.SmartVote.datas.models.OTPtoken;
 import africa.vote.SmartVote.datas.models.Users;
 import africa.vote.SmartVote.datas.repositories.TokenRepository;
@@ -11,7 +11,6 @@ import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.EmailService;
 import africa.vote.SmartVote.services.UserService;
 import africa.vote.SmartVote.utils.TokenGenerator;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +18,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
+import static africa.vote.SmartVote.datas.enums.Status.VERIFIED;
 import static africa.vote.SmartVote.utils.EmailUtils.buildEmail;
 
 @Service
@@ -37,7 +37,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public String createAccount(OTPVerificationRequest otpVerificationRequest) {
         OTPVerification(otpVerificationRequest);
-        userRepository.verifyUser(Status.VERIFIED, otpVerificationRequest.getEmail());
+        var foundUser = userRepository.findByEmailIgnoreCase(otpVerificationRequest.getEmail()).
+                orElseThrow(() -> new GenericException(String.format("User with %s not found", otpVerificationRequest.getEmail())));
+        userRepository.verifyUser(VERIFIED, foundUser.getEmail());
         return "User verification successful";
     }
 
@@ -70,7 +72,6 @@ public class UserServiceImpl implements UserService {
     public String OTPVerification(OTPVerificationRequest otpVerificationRequest) {
         OTPtoken foundOtPtoken = tokenRepository.findOTPtokenByToken(otpVerificationRequest.getToken()).
                 orElseThrow(() -> new GenericException("Token doesn't exist"));
-
         if(foundOtPtoken.getExpiredTime().isBefore(Instant.now())) throw new GenericException("OTP already expired");
         if(foundOtPtoken.getConfirmedTime() != null) throw new GenericException("OTP has already been used");
         if(!Objects.equals(otpVerificationRequest.getToken(), foundOtPtoken.getToken())) throw new GenericException("OTP isn't correct");
@@ -81,5 +82,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<Users> getByEmailAddress(String email) {
         return userRepository.findByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public String resendOTP(ResendOtpRequest resendOtpRequest) {
+        var generatedToken = TokenGenerator.generaToken();
+        var foundUser = userRepository.findByEmailIgnoreCase(resendOtpRequest.getEmail()).orElseThrow(() -> new GenericException("User with " + resendOtpRequest.getEmail() + " not found"));
+        if(Objects.equals(resendOtpRequest.getEmail(), foundUser.getEmail())) emailService.sendEmail(resendOtpRequest.getEmail(), buildEmail(foundUser.getFirstName(),generatedToken));
+        return "Token sent successfully to " + resendOtpRequest.getEmail() + " ";
     }
 }

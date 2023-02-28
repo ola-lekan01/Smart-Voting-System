@@ -2,9 +2,7 @@ package africa.vote.SmartVote.datas.dtos.requests;
 
 import lombok.Data;
 
-
 @Data
-public class OTPVerificationRequest {
-    private String token;
+public class ResendOtpRequest {
     private String email;
 }
