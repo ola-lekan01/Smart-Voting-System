@@ -38,6 +38,7 @@ public class UserController {
     @PostMapping("/resend")
     public ResponseEntity<?> resendToken(@Valid @RequestBody ResendTokenRequest tokenRequest,
                                          HttpServletRequest request){
+
         var data = userService.resendOTP(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
