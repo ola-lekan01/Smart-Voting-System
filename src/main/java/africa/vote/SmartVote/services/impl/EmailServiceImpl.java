@@ -3,7 +3,6 @@ package africa.vote.SmartVote.services.impl;
 import africa.vote.SmartVote.services.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -33,7 +32,6 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setFrom("adulojujames@gmail.com");
             mimeMessageHelper.setText(email, true);
             javaMailSender.send(mailMessage);
-            System.out.println("Mail sent successfully");
         } catch (MessagingException e) {
             throw new RuntimeException();
         } catch (MailException e) {

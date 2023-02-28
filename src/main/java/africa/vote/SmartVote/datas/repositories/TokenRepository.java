@@ -19,4 +19,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     void setConfirmedAt(LocalDateTime confirmedAt, Long tokenId);
 
     Optional<Token> findByToken(String token);
+
+    Optional<Token> findByUserId(Long id);
 }

@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public ApiData createAccount(TokenRequest tokenRequest) {
         OTPVerification(tokenRequest);
         userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
-        var foundUser = getByEmailAddress(tokenRequest.getEmail())
+        var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
                 .orElseThrow(() -> new GenericException("User Not found"));
         return ApiData.builder()
                 .data(jwtService.generateToken(foundUser))
@@ -66,12 +66,10 @@ public class UserServiceImpl implements UserService {
     public ApiData otpTokenGeneration(ResendTokenRequest resendTokenRequest, User savedUser) {
         final String generateToken = TokenGenerator.generaToken();
         var token = new Token(generateToken, savedUser);
-
-        var foundUserOTP = tokenRepository.findById(savedUser.getId())
-                .orElseThrow(()-> new GenericException("Token does not Exist!!!"));
-        if(Objects.isNull(foundUserOTP)) tokenRepository.save(token);
+        if(tokenRepository.findByUserId(savedUser.getId()).isEmpty()) tokenRepository.save(token);
 
         else{
+            var foundUserOTP = tokenRepository.findByUserId(savedUser.getId()).get();
             foundUserOTP.setToken(generateToken);
             foundUserOTP.setCreatedTime(LocalDateTime.now());
             foundUserOTP.setConfirmedTime(LocalDateTime.now().plusMinutes(10));
@@ -100,7 +98,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getByEmailAddress(String email) {
+    public Optional<User> findByEmailIgnoreCase(String email) {
         return userRepository.findByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public String resendOTP(TokenRequest tokenRequest) {
+        var generatedToken = TokenGenerator.generaToken();
+        var foundUser = userRepository.findByEmailIgnoreCase(tokenRequest.getEmail())
+                .orElseThrow(() -> new GenericException("User with " + tokenRequest.getEmail() + " not found"));
+        if(Objects.equals(tokenRequest.getEmail(), foundUser.getEmail()))
+            emailService.sendEmail(tokenRequest.getEmail(), buildEmail(foundUser.getFirstName(),generatedToken));
+        return "Token sent successfully to " + tokenRequest.getEmail() + " ";
     }
 }

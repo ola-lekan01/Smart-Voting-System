@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping("api/v1/registration/")
+@CrossOrigin("*")
 public class RegistrationController {
     public final RegistrationService registrationService;
 
@@ -37,18 +38,4 @@ public class RegistrationController {
                 .build();
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
-
-    @GetMapping("test")
-    public ResponseEntity<?> test(HttpServletRequest httpServletRequest) throws MessagingException {
-
-        ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.CREATED)
-                .data("Registration Test End Point")
-                .timestamp(ZonedDateTime.now())
-                .path(httpServletRequest.getRequestURI())
-                .isSuccessful(true)
-                .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-    }
-
 }
