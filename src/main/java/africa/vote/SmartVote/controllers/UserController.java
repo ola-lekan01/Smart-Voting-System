@@ -1,7 +1,7 @@
 package africa.vote.SmartVote.controllers;
 
+import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
-import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,10 +23,10 @@ public class UserController {
     @PostMapping("create")
     public ResponseEntity<?> createUser(@Valid @RequestBody TokenRequest tokenRequest,
                                         HttpServletRequest request) {
-        ApiData createdUser = userService.createAccount(tokenRequest);
+        var data = userService.createAccount(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(createdUser)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)
@@ -34,4 +34,35 @@ public class UserController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
+
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendToken(@Valid @RequestBody ResendTokenRequest tokenRequest,
+                                         HttpServletRequest request){
+        var data = userService.resendOTP(tokenRequest);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .data(data)
+                .timestamp(ZonedDateTime.now())
+                .path(request.getRequestURI())
+                .isSuccessful(true)
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("forget-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ResendTokenRequest tokenRequest,
+                                                      HttpServletRequest httpServletRequest){
+        var data = userService.sendOTP(tokenRequest);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .data(data)
+                .timestamp(ZonedDateTime.now())
+                .path(httpServletRequest.getRequestURI())
+                .isSuccessful(true)
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
 }
