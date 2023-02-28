@@ -1,7 +1,7 @@
 package africa.vote.SmartVote.services.impl;
 
+import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.OTPVerificationRequest;
-import africa.vote.SmartVote.datas.dtos.requests.ResendOtpRequest;
 import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
 import africa.vote.SmartVote.datas.models.OTPtoken;
 import africa.vote.SmartVote.datas.models.Users;
@@ -12,12 +12,14 @@ import africa.vote.SmartVote.services.EmailService;
 import africa.vote.SmartVote.services.UserService;
 import africa.vote.SmartVote.utils.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
+import static africa.vote.SmartVote.datas.enums.Status.UNVERIFIED;
 import static africa.vote.SmartVote.datas.enums.Status.VERIFIED;
 import static africa.vote.SmartVote.utils.EmailUtils.buildEmail;
 
@@ -29,6 +31,9 @@ public class UserServiceImpl implements UserService {
     private TokenRepository tokenRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public Users saveUser(Users user) {
         return userRepository.save(user);
@@ -65,7 +70,7 @@ public class UserServiceImpl implements UserService {
             tokenRepository.save(foundToken);
         }
         emailService.sendEmail(sendotpRequest.getEmail(), buildEmail(savedUser.getFirstName(), generateToken));
-        return "Token successfully sent to your email, please confirm now!!!";
+        return "Token successfully sent to  " + sendotpRequest.getEmail() + ", please confirm now!!!";
     }
 
     @Override
@@ -85,10 +90,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String resendOTP(ResendOtpRequest resendOtpRequest) {
-        var generatedToken = TokenGenerator.generaToken();
-        var foundUser = userRepository.findByEmailIgnoreCase(resendOtpRequest.getEmail()).orElseThrow(() -> new GenericException("User with " + resendOtpRequest.getEmail() + " not found"));
-        if(Objects.equals(resendOtpRequest.getEmail(), foundUser.getEmail())) emailService.sendEmail(resendOtpRequest.getEmail(), buildEmail(foundUser.getFirstName(),generatedToken));
-        return "Token sent successfully to " + resendOtpRequest.getEmail() + " ";
+    public String resendOTP(Long userId) {
+        var foundUser = userRepository.findUsersById(userId).orElseThrow(() -> new GenericException("User with found"));
+        SendotpRequest sendotpRequest = new SendotpRequest();
+        return otpTokenGeneration(sendotpRequest, foundUser);
     }
+
+    @Override
+    public String login(LoginRequest loginRequest) {
+        Users foundUser = getByEmailAddress(loginRequest.getEmail()).orElseThrow(() -> new GenericException(String.format("User with %s not found", loginRequest.getEmail())));
+        if(foundUser.getStatus() == UNVERIFIED) throw new GenericException("User account has not been verified");
+        if(!Objects.equals(foundUser.getPhoneNumber(), loginRequest.getPhoneNumber()) || !Objects.equals(foundUser.getEmail(), loginRequest.getEmail())) throw new GenericException("Username or password incorrect");
+        if(!passwordEncoder.matches(loginRequest.getPassword(), foundUser.getPassword())) throw new GenericException("Username or password incorrect");
+        return "Login successful";
+    }
+
 }

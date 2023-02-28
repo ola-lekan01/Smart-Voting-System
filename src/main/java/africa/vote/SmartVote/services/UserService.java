@@ -1,7 +1,7 @@
 package africa.vote.SmartVote.services;
 
+import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.OTPVerificationRequest;
-import africa.vote.SmartVote.datas.dtos.requests.ResendOtpRequest;
 import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
 import africa.vote.SmartVote.datas.models.Users;
 
@@ -14,6 +14,7 @@ public interface UserService {
     String otpTokenGeneration(SendotpRequest sendotpRequest, Users user);
     String OTPVerification(OTPVerificationRequest otpVerificationRequest);
     Optional<Users> getByEmailAddress(String email);
-    String resendOTP(ResendOtpRequest resendOtpRequest);
+    String resendOTP(Long userId);
+    String login(LoginRequest loginRequest);
 }
 
