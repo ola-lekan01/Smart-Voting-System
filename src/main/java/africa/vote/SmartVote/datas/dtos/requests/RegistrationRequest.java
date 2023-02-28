@@ -1,6 +1,6 @@
 package africa.vote.SmartVote.datas.dtos.requests;
 
-import africa.vote.SmartVote.datas.enums.Cohort;
+import africa.vote.SmartVote.datas.enums.Category;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,6 +25,6 @@ public class RegistrationRequest {
     private String phoneNumber;
     private String password;
     @Enumerated(EnumType.STRING)
-    private Cohort cohort;
+    private Category category;
     private String imageUrl;
 }

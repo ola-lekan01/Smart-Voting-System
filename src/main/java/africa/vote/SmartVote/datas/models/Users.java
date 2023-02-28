@@ -1,6 +1,6 @@
 package africa.vote.SmartVote.datas.models;
 
-import africa.vote.SmartVote.datas.enums.Cohort;
+import africa.vote.SmartVote.datas.enums.Category;
 import africa.vote.SmartVote.datas.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -31,7 +31,7 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)
-    private Cohort cohort;
+    private Category category;
     private String imageUrl;
     @JsonIgnore
     private String password;

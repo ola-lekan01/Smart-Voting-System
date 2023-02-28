@@ -1,6 +1,6 @@
 package africa.vote.SmartVote.datas.enums;
 
-public enum Cohort {
+public enum Category {
     COHORT_I,
     COHORT_II,
     COHORT_III,

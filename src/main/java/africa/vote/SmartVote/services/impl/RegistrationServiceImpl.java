@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static africa.vote.SmartVote.datas.enums.Cohort.COHORT_I;
+import static africa.vote.SmartVote.datas.enums.Category.COHORT_I;
 import static africa.vote.SmartVote.datas.enums.Status.UNVERIFIED;
 
 @Service
@@ -33,7 +33,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .email(registrationRequest.getEmail())
                 .imageUrl(registrationRequest.getImageUrl())
                 .password(passwordEncoder.encode(registrationRequest.getPassword()))
-                .cohort(COHORT_I)
+                .category(COHORT_I)
                 .status(UNVERIFIED)
                 .build();
         userService.saveUser(users);
