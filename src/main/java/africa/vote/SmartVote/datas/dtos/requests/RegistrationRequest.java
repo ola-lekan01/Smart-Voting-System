@@ -1,17 +1,18 @@
 package africa.vote.SmartVote.datas.dtos.requests;
 
 import africa.vote.SmartVote.datas.enums.Category;
-import africa.vote.SmartVote.datas.enums.Status;
-import jakarta.mail.Message;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegistrationRequest {
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
@@ -23,7 +24,7 @@ public class RegistrationRequest {
     @Column(name = "phone_number", nullable = false, length = 100)
     private String phoneNumber;
     private String password;
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Category category;
     private String imageUrl;
 }

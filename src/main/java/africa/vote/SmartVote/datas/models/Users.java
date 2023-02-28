@@ -28,10 +28,9 @@ public class Users {
     @Column(name="email", nullable = false, length = 100)
     @Email(message = "This field requires a valid email address")
     private String email;
-    @Column(name = "status", nullable = false, length = 100)
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Category category;
     private String imageUrl;
     @JsonIgnore
