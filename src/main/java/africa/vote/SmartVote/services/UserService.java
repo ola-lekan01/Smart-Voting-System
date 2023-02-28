@@ -11,8 +11,7 @@ public interface UserService {
     void saveUser(User user);
     ApiData createAccount(TokenRequest tokenRequest);
     ApiData sendOTP(ResendTokenRequest resendTokenRequest);
-    ApiData generateToken(ResendTokenRequest resendTokenRequest, User user);
-    ApiData TokenVerification(TokenRequest tokenRequest);
+    void TokenVerification(TokenRequest tokenRequest);
     Optional<User> findByEmailIgnoreCase(String email);
     ApiData resendOTP(ResendTokenRequest tokenRequest);
 }

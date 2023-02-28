@@ -56,14 +56,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiData sendOTP(ResendTokenRequest resendTokenRequest) {
-        User user = userRepository.findByEmailIgnoreCase(resendTokenRequest.getEmail())
+        var user = userRepository.findByEmailIgnoreCase(resendTokenRequest.getEmail())
                 .orElseThrow(() -> new GenericException
                         ("user with " + resendTokenRequest.getEmail() + " doesn't exist"));
+
         return generateToken(resendTokenRequest, user);
     }
 
-    @Override
-    public ApiData generateToken(ResendTokenRequest resendTokenRequest, User savedUser) {
+
+    private ApiData generateToken(ResendTokenRequest resendTokenRequest, User savedUser) {
         final String generateToken = TokenGenerator.generaToken();
         var token = new Token(generateToken, savedUser);
         if(tokenRepository.findByUserId(savedUser.getId()).isEmpty()) tokenRepository.save(token);
@@ -78,13 +79,14 @@ public class UserServiceImpl implements UserService {
         }
         emailService.sendEmail(resendTokenRequest.getEmail(),
                 buildEmail(savedUser.getFirstName(), generateToken));
+
         return ApiData.builder()
                 .data("Token successfully sent to  " + resendTokenRequest.getEmail())
                 .build();
     }
 
     @Override
-    public ApiData TokenVerification(TokenRequest tokenRequest) {
+    public void TokenVerification(TokenRequest tokenRequest) {
         Token foundToken = tokenRepository.findByToken(tokenRequest.getToken()).
                 orElseThrow(() -> new GenericException("Token doesn't exist"));
 
@@ -92,9 +94,6 @@ public class UserServiceImpl implements UserService {
         if(foundToken.getConfirmedTime() != null) throw new GenericException("OTP has already been used");
         if(!Objects.equals(tokenRequest.getToken(), foundToken.getToken())) throw new GenericException("OTP isn't correct");
         tokenRepository.setConfirmedAt(LocalDateTime.now(), foundToken.getId());
-        return ApiData.builder()
-                .data("Confirmed")
-                .build();
     }
 
     @Override
@@ -104,11 +103,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiData resendOTP(ResendTokenRequest tokenRequest) {
-        var generatedToken = TokenGenerator.generaToken();
         var foundUser = userRepository.findByEmailIgnoreCase(tokenRequest.getEmail())
                 .orElseThrow(() -> new GenericException("User with " + tokenRequest.getEmail() + " not found"));
-        if(Objects.equals(tokenRequest.getEmail(), foundUser.getEmail()))
-            emailService.sendEmail(tokenRequest.getEmail(), buildEmail(foundUser.getFirstName(),generatedToken));
+
+        if(Objects.equals(tokenRequest.getEmail(), foundUser.getEmail())){
+            generateToken(tokenRequest, foundUser);
+        }
         return ApiData.builder()
                 .data("Token sent to " + tokenRequest.getEmail())
                 .build();
