@@ -11,6 +11,7 @@ import java.util.Optional;
 @Transactional
 public interface UserRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByEmailIgnoreCase(String email);
+    Optional<Users> findUsersById(Long id);
     @Modifying
     @Query("UPDATE Users users " +
             "SET users.status = ?1 " +
