@@ -1,7 +1,7 @@
 package africa.vote.SmartVote.controllers;
 
-import africa.vote.SmartVote.datas.dtos.requests.OTPVerificationRequest;
-import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
+import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
+import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,18 +14,19 @@ import org.springframework.web.bind.annotation.*;
 import java.time.ZonedDateTime;
 
 @RestController
-@RequestMapping("api/v1/user")
-public class User {
+@RequestMapping("/api/v1/user/")
+@CrossOrigin("*")
+public class UserController {
     @Autowired
     public UserService userService;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createUser(@Valid @RequestBody OTPVerificationRequest otpVerificationRequest,
+    @PostMapping("create")
+    public ResponseEntity<?> createUser(@Valid @RequestBody TokenRequest tokenRequest,
                                         HttpServletRequest request) {
-        String createdUser = userService.createAccount(otpVerificationRequest);
+        var data = userService.createAccount(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(createdUser)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)
@@ -34,12 +35,13 @@ public class User {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("resendOTP/{userId}")
-    public ResponseEntity<?> resendToken(@PathVariable Long userId, HttpServletRequest request){
-        String resend = userService.resendOTP(userId);
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendToken(@Valid @RequestBody ResendTokenRequest tokenRequest,
+                                         HttpServletRequest request){
+        var data = userService.resendOTP(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(resend)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)
@@ -48,12 +50,13 @@ public class User {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<?> sendOTPForForgotPassword(@Valid @RequestBody SendotpRequest sendotpRequest, HttpServletRequest httpServletRequest){
-        String sendOTP = userService.sendOTP(sendotpRequest);
+    @PostMapping("forget-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ResendTokenRequest tokenRequest,
+                                                      HttpServletRequest httpServletRequest){
+        var data = userService.sendOTP(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(sendOTP)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(httpServletRequest.getRequestURI())
                 .isSuccessful(true)

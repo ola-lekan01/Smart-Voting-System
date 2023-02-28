@@ -1,20 +1,19 @@
 package africa.vote.SmartVote.services;
 
-import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
-import africa.vote.SmartVote.datas.dtos.requests.OTPVerificationRequest;
-import africa.vote.SmartVote.datas.dtos.requests.SendotpRequest;
-import africa.vote.SmartVote.datas.models.Users;
+import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
+import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
+import africa.vote.SmartVote.datas.dtos.responses.ApiData;
+import africa.vote.SmartVote.datas.models.User;
 
 import java.util.Optional;
 
 public interface UserService {
-    Users saveUser(Users user);
-    String createAccount(OTPVerificationRequest otpVerificationRequest);
-    String sendOTP(SendotpRequest sendotpRequest);
-    String otpTokenGeneration(SendotpRequest sendotpRequest, Users user);
-    String OTPVerification(OTPVerificationRequest otpVerificationRequest);
-    Optional<Users> getByEmailAddress(String email);
-    String resendOTP(Long userId);
-    String login(LoginRequest loginRequest);
+    void saveUser(User user);
+    ApiData createAccount(TokenRequest tokenRequest);
+    ApiData sendOTP(ResendTokenRequest resendTokenRequest);
+    ApiData generateToken(ResendTokenRequest resendTokenRequest, User user);
+    ApiData TokenVerification(TokenRequest tokenRequest);
+    Optional<User> findByEmailIgnoreCase(String email);
+    ApiData resendOTP(ResendTokenRequest tokenRequest);
 }
 
