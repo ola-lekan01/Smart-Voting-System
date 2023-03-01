@@ -18,6 +18,11 @@ public class SecurityConfig {
     private final JWTAuthenticationFilter JWTAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private static final String[] AUTH_WHITELIST = {
+            "/authenticate",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/webjars/**",
             "/api/v1/registration/**",
             "/api/v1/user/**"
     };
