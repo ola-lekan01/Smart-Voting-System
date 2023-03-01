@@ -17,5 +17,4 @@ public class Result {
     private Long id;
     @Column(name="no_of_votes", nullable = false, length = 255)
     private String noOfVotes;
-
 }

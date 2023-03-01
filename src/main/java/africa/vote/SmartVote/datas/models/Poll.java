@@ -37,7 +37,7 @@ public class Poll {
     @JoinColumn(name = "users", referencedColumnName = "id")
     @ManyToOne
     private User users;
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Category category;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "poll_id", referencedColumnName = "id")

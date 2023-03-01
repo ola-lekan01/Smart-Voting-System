@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+
     @Override
     public ApiData sendOTP(ResendTokenRequest resendTokenRequest) {
         var user = userRepository.findByEmailIgnoreCase(resendTokenRequest.getEmail())
@@ -127,4 +128,11 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getById(Long userId) {
         return userRepository.findById(userId);
     }
+
+    @Override
+    public String getUserName() {
+        return jwtService.getUserName();
+    }
+
+
 }

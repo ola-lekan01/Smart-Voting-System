@@ -11,18 +11,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/poll")
-public class Poll {
-    @Autowired
-    private PollService pollService;
+public class PollController {
+    private final PollService pollService;
 
-    @PostMapping("/create-poll/{user_id}")
-    public ResponseEntity<?> createPoll(@PathVariable("user_id") Long userId, @Valid @RequestBody CreatePollRequest createPollRequest,
+    @Autowired
+    public PollController(PollService pollService) {
+        this.pollService = pollService;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createPoll(@Valid @RequestBody CreatePollRequest createPollRequest,
                                         HttpServletRequest request) {
-        String createdPoll = pollService.createPoll(userId, createPollRequest);
+
+        String createdPoll = pollService.createPoll(createPollRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
                 .data(createdPoll)
@@ -34,10 +38,9 @@ public class Poll {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("{user_id}/active-polls")
-    public ResponseEntity<?> activePolls(@PathVariable("user_id") Long userId,
-                                        HttpServletRequest request) {
-        var activePolls = pollService.activePolls(userId);
+    @GetMapping("/active")
+    public ResponseEntity<?> activePolls(HttpServletRequest request) {
+        var activePolls = pollService.activePolls();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
                 .data(activePolls)
@@ -48,7 +51,7 @@ public class Poll {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
-    @GetMapping("/recent-polls")
+    @GetMapping("/recent")
     public ResponseEntity<?> recentPolls(HttpServletRequest request) {
         var recentPolls = pollService.recentPolls();
         ApiResponse apiResponse = ApiResponse.builder()
@@ -61,5 +64,4 @@ public class Poll {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
-
 }
