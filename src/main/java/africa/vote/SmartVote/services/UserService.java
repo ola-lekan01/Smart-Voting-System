@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.services;
 
+import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
@@ -14,5 +15,6 @@ public interface UserService {
     void TokenVerification(TokenRequest tokenRequest);
     Optional<User> findByEmailIgnoreCase(String email);
     ApiData resendOTP(ResendTokenRequest tokenRequest);
+    ApiData authenticate(LoginRequest request);
 }
 

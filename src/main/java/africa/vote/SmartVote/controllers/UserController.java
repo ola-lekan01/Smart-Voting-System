@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.controllers;
 
+import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
@@ -35,7 +36,7 @@ public class UserController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("/resend")
+    @PostMapping("resend")
     public ResponseEntity<?> resendToken(@Valid @RequestBody ResendTokenRequest tokenRequest,
                                          HttpServletRequest request){
 
@@ -55,6 +56,21 @@ public class UserController {
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ResendTokenRequest tokenRequest,
                                                       HttpServletRequest httpServletRequest){
         var data = userService.sendOTP(tokenRequest);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .data(data)
+                .timestamp(ZonedDateTime.now())
+                .path(httpServletRequest.getRequestURI())
+                .isSuccessful(true)
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                            HttpServletRequest httpServletRequest){
+        var data = userService.authenticate(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
                 .data(data)

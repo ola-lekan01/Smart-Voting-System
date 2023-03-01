@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.services.impl;
 
+import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
@@ -111,6 +112,15 @@ public class UserServiceImpl implements UserService {
         }
         return ApiData.builder()
                 .data("Token sent to " + tokenRequest.getEmail())
+                .build();
+    }
+
+    @Override
+    public ApiData authenticate(LoginRequest request) {
+        var foundUser = findByEmailIgnoreCase(request.getEmail())
+                .orElseThrow(() -> new GenericException("User Not found"));
+        return ApiData.builder()
+                .data(jwtService.generateToken(foundUser))
                 .build();
     }
 }
