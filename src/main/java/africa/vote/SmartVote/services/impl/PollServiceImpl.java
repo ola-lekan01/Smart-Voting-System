@@ -1,8 +1,8 @@
 package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
+import africa.vote.SmartVote.datas.enums.Category;
 import africa.vote.SmartVote.datas.models.Poll;
-import africa.vote.SmartVote.datas.models.User;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.PollService;
@@ -17,19 +17,27 @@ import java.util.List;
 
 @Service
 public class PollServiceImpl implements PollService {
+    private final PollRepository pollRepository;
+    private final UserService userService;
+
     @Autowired
-    private PollRepository pollRepository;
-    @Autowired
-    private UserService userService;
+    public PollServiceImpl(PollRepository pollRepository, UserService userService) {
+        this.pollRepository = pollRepository;
+        this.userService = userService;
+    }
+
     @Override
-    public String createPoll(Long userId, CreatePollRequest createPollRequest) {
-        User foundUser = userService.getById(userId).get();
+    public String createPoll(CreatePollRequest createPollRequest) {
+        var userEmail = userService.getUserName();
+        var foundUser = userService.findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("User Not found"));
+
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
+
         //2023-04-01
         LocalDate startDate = LocalDate.parse(createPollRequest.getStartDate(), dateFormatter);
         LocalDate endDate = LocalDate.parse(createPollRequest.getEndDate(), dateFormatter);
-
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
         //"10:30:00 AM"
         LocalTime startTime = LocalTime.parse(createPollRequest.getStartTime(), timeFormatter);
         LocalTime endTime = LocalTime.parse(createPollRequest.getEndTime(), timeFormatter);
@@ -42,16 +50,16 @@ public class PollServiceImpl implements PollService {
         if (endDate.isBefore(LocalDate.now()))throw new GenericException("End date cant be before current date");
         if (endTime.isBefore(LocalTime.now()))throw new GenericException("End time cant be before current time");
         Poll poll = Poll.builder().
-                title(createPollRequest.getTitle()).
-                question(createPollRequest.getQuestion()).
-                startDate(startDate).
-                startTime(startTime).
-                endDate(endDate).
-                endTime(endTime).
-                candidates(createPollRequest.getCandidates()).
-                users(foundUser).
-                category(createPollRequest.getCategory()).
-                build();
+                title(createPollRequest.getTitle())
+                .question(createPollRequest.getQuestion())
+                .startDate(startDate)
+                .startTime(startTime)
+                .endDate(endDate)
+                .endTime(endTime)
+                .candidates(createPollRequest.getCandidates())
+                .category(Category.getCategory(createPollRequest.getCategory()))
+                .users(foundUser)
+                .build();
         pollRepository.save(poll);
         return "Poll Successfully created";
     }
@@ -66,8 +74,11 @@ public class PollServiceImpl implements PollService {
                 ).toList();
     }
     @Override
-    public List<Poll> activePolls(Long userId) {
-        User foundUser = userService.getById(userId).get();
+    public List<Poll> activePolls() {
+        var userEmail = userService.getUserName();
+        var foundUser = userService.findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("User Not found"));
+
         return pollRepository.findAll()
                 .stream().filter(poll -> (poll.getEndTime().isAfter(LocalTime.now())
                 && poll.getEndDate().isAfter(LocalDate.now())

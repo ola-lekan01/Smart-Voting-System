@@ -17,5 +17,6 @@ public interface UserService {
     ApiData resendOTP(ResendTokenRequest tokenRequest);
     ApiData authenticate(LoginRequest request);
     Optional<User> getById(Long userId);
+    String getUserName();
 }
 

@@ -17,10 +17,10 @@ public class RegistrationRequest {
     @Email(message = "This field requires a valid email address")
     @NotBlank(message = "This Field cannot be blank")
     private String email;
+    @NotBlank(message = "This field Cannot be Blank")
     private String phoneNumber;
     @NotBlank(message = "This Field cannot be blank")
     private String password;
     @NotBlank(message = "This Field cannot be blank")
     private String category;
-    private String imageUrl;
 }
