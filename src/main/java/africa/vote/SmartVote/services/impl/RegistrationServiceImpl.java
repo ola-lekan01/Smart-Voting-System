@@ -4,7 +4,6 @@ import africa.vote.SmartVote.datas.dtos.requests.RegistrationRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.enums.Category;
-import africa.vote.SmartVote.datas.enums.Role;
 import africa.vote.SmartVote.datas.models.User;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.RegistrationService;
@@ -35,11 +34,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .lastName(registrationRequest.getLastName())
                 .phoneNumber(registrationRequest.getPhoneNumber())
                 .email(registrationRequest.getEmail().toLowerCase())
-                .imageUrl(registrationRequest.getImageUrl())
                 .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .category(Category.getCategory(registrationRequest.getCategory()))
                 .status(UNVERIFIED)
-                .role(Role.USER)
                 .build();
         userService.saveUser(user);
         ResendTokenRequest tokenRequest = ResendTokenRequest.builder()
