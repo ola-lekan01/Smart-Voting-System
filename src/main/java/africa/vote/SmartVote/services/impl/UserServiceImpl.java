@@ -1,11 +1,11 @@
 package africa.vote.SmartVote.services.impl;
-
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
-import africa.vote.SmartVote.datas.enums.Status;
 import africa.vote.SmartVote.datas.models.Token;
 import africa.vote.SmartVote.datas.models.User;
+import africa.vote.SmartVote.datas.dtos.requests.ForgotPasswordRequest;
+import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.repositories.TokenRepository;
 import africa.vote.SmartVote.datas.repositories.UserRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
@@ -14,12 +14,15 @@ import africa.vote.SmartVote.services.EmailService;
 import africa.vote.SmartVote.services.UserService;
 import africa.vote.SmartVote.utils.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static africa.vote.SmartVote.datas.enums.Status.UNVERIFIED;
+import static africa.vote.SmartVote.datas.enums.Status.VERIFIED;
 import static africa.vote.SmartVote.utils.EmailUtils.buildEmail;
 
 @Service
@@ -27,15 +30,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenRepository tokenRepository,
-                           EmailService emailService, JWTService jwtService) {
+                           EmailService emailService, JWTService jwtService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiData createAccount(TokenRequest tokenRequest) {
         TokenVerification(tokenRequest);
-        userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
+        userRepository.verifyUser(VERIFIED, tokenRequest.getEmail());
         var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
                 .orElseThrow(() -> new GenericException("User Not found"));
         return ApiData.builder()
@@ -113,4 +118,34 @@ public class UserServiceImpl implements UserService {
                 .data("Token sent to " + tokenRequest.getEmail())
                 .build();
     }
+
+    @Override
+    public ApiData login(LoginRequest loginRequest) {
+        User foundUser = findByEmailIgnoreCase(loginRequest.getEmail()).orElseThrow(() -> new GenericException("User doesn't exist"));
+        if(foundUser.getStatus() == UNVERIFIED) throw new GenericException("This account has not been verified, proceed to verify account");
+        boolean correctPassword = passwordEncoder.matches(loginRequest.getPassword(), foundUser.getPassword());
+        if(!correctPassword)throw new GenericException("Invalid login details");
+
+        return ApiData.builder()
+                .data("Login successful")
+                .build();
+    }
+
+    @Override
+    public ApiData forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
+        User user = userRepository.findByEmailIgnoreCase(forgotPasswordRequest.getEmail()).orElseThrow(() -> new GenericException("User does not exist"));
+        user.setPassword(passwordEncoder.encode(forgotPasswordRequest.getPassword()));
+        userRepository.save(user);
+
+        return ApiData.builder()
+                .data("Password reset successful")
+                .build();
+    }
+
+    @Override
+    public ApiData changePassword(ForgotPasswordRequest forgotPasswordRequest) {
+        return null;
+    }
+
 }
+
