@@ -2,7 +2,7 @@ package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.models.Poll;
-import africa.vote.SmartVote.datas.models.Users;
+import africa.vote.SmartVote.datas.models.User;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.PollService;
@@ -24,7 +24,7 @@ public class PollServiceImpl implements PollService {
     private UserService userService;
     @Override
     public String createPoll(Long userId, CreatePollRequest createPollRequest) {
-        Users foundUser = userService.getById(userId).get();
+        User foundUser = userService.getById(userId).get();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         //2023-04-01
         LocalDate startDate = LocalDate.parse(createPollRequest.getStartDate(), dateFormatter);
@@ -68,7 +68,7 @@ public class PollServiceImpl implements PollService {
     }
     @Override
     public List<Poll> activePolls(Long userId) {
-        Users foundUser = userService.getById(userId).get();
+        User foundUser = userService.getById(userId).get();
         return pollRepository.findAll()
                 .stream().filter(poll -> (poll.getEndTime().isAfter(LocalTime.now())
                 && poll.getEndDate().isAfter(LocalDate.now())

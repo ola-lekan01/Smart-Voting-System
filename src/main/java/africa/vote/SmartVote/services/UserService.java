@@ -14,5 +14,6 @@ public interface UserService {
     void TokenVerification(TokenRequest tokenRequest);
     Optional<User> findByEmailIgnoreCase(String email);
     ApiData resendOTP(ResendTokenRequest tokenRequest);
+    Optional<User> getById(Long userId);
 }
 
