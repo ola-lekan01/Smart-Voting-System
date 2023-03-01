@@ -13,4 +13,5 @@ public interface UserService {
     String otpTokenGeneration(SendotpRequest sendotpRequest, Users user);
     String OTPVerification(OTPVerificationRequest otpVerificationRequest);
     Optional<Users> getByEmailAddress(String email);
+    Optional<Users> getById(Long id);
 }

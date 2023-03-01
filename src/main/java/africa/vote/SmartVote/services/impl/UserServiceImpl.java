@@ -82,4 +82,9 @@ public class UserServiceImpl implements UserService {
     public Optional<Users> getByEmailAddress(String email) {
         return userRepository.findByEmailIgnoreCase(email);
     }
+
+    @Override
+    public Optional<Users> getById(Long id) {
+        return userRepository.findById(id);
+    }
 }
