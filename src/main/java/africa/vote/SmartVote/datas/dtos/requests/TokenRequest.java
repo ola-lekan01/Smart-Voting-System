@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SendotpRequest {
+public class TokenRequest {
+    private String token;
     private String email;
 }

@@ -9,7 +9,7 @@ public class TokenGenerator {
        return generateRandomNumber().toString();
     }
 
-    public static Integer generateRandomNumber(){
+    private static Integer generateRandomNumber(){
         return 1000 + secureRandom.nextInt(999);
     }
 }
