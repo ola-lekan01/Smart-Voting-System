@@ -36,7 +36,7 @@ public class Poll {
     private LocalTime endTime;
     @JoinColumn(name = "users", referencedColumnName = "id")
     @ManyToOne
-    private Users users;
+    private User users;
     @Enumerated(EnumType.ORDINAL)
     private Category category;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

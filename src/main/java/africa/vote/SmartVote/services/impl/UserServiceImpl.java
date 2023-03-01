@@ -113,4 +113,11 @@ public class UserServiceImpl implements UserService {
                 .data("Token sent to " + tokenRequest.getEmail())
                 .build();
     }
+
+    @Override
+    public Optional<User> getById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+
 }
