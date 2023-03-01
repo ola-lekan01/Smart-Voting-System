@@ -92,6 +92,6 @@ public class ApplicationConfig {
                 = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return List.of(new SecurityReference(AUTHORIZATION_HEADER, authorizationScopes));
+        return List.of(new SecurityReference("JWT", authorizationScopes));
     }
 }

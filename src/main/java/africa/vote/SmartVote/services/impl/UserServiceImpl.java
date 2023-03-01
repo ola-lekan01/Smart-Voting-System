@@ -123,4 +123,8 @@ public class UserServiceImpl implements UserService {
                 .data(jwtService.generateToken(foundUser))
                 .build();
     }
+    @Override
+    public Optional<User> getById(Long userId) {
+        return userRepository.findById(userId);
+    }
 }

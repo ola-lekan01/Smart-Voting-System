@@ -16,5 +16,6 @@ public interface UserService {
     Optional<User> findByEmailIgnoreCase(String email);
     ApiData resendOTP(ResendTokenRequest tokenRequest);
     ApiData authenticate(LoginRequest request);
+    Optional<User> getById(Long userId);
 }
 
