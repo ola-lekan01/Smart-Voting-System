@@ -34,7 +34,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .lastName(registrationRequest.getLastName())
                 .phoneNumber(registrationRequest.getPhoneNumber())
                 .email(registrationRequest.getEmail().toLowerCase())
-                .imageUrl(registrationRequest.getImageUrl())
                 .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .category(Category.getCategory(registrationRequest.getCategory()))
                 .status(UNVERIFIED)

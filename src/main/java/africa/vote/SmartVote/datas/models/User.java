@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-
 @Entity
 @Table(name = "app_user")
 @Data
@@ -29,7 +28,7 @@ public class User implements UserDetails {
     private Long id;
     @Column(name="first_name", nullable = false, length = 100)
     private String firstName;
-    @Column(name="last_name", nullable = false, length = 100)
+    @Column(name="last_name", length = 100)
     private String lastName;
     @Column(name = "phone_number", nullable = false, length = 15)
     private String phoneNumber;
@@ -44,12 +43,10 @@ public class User implements UserDetails {
     private String imageUrl;
     @JsonIgnore
     private String password;
-    @Enumerated(EnumType.STRING)
-    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(Role.USER.name()));
     }
 
     @Override
