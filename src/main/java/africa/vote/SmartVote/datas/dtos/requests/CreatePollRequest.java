@@ -2,6 +2,7 @@ package africa.vote.SmartVote.datas.dtos.requests;
 
 import africa.vote.SmartVote.datas.models.Candidate;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.List;
@@ -13,15 +14,15 @@ public class CreatePollRequest {
     @NotBlank(message = "This field Cannot be Blank")
     private String question;
     @NotBlank(message = "This field Cannot be Blank")
-    private String startDate;
+    private String startDateTime;
+//    @NotBlank(message = "This field Cannot be Blank")
+//    private String startTime;
     @NotBlank(message = "This field Cannot be Blank")
-    private String startTime;
-    @NotBlank(message = "This field Cannot be Blank")
-    private String endDate;
-    @NotBlank(message = "This field Cannot be Blank")
-    private String endTime;
+    private String endDateTime;
+//    @NotBlank(message = "This field Cannot be Blank")
+//    private String endTime;
     @NotBlank(message = "This field Cannot be Blank")
     private String category;
-    @NotBlank(message = "This field Cannot be Blank")
+    @NotEmpty(message = "This field Cannot be Blank")
     private List<Candidate> candidates;
 }
