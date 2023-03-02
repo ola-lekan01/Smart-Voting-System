@@ -1,14 +1,21 @@
 package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
+import africa.vote.SmartVote.datas.dtos.requests.VoteRequest;
 import africa.vote.SmartVote.datas.enums.Category;
+import africa.vote.SmartVote.datas.models.Candidate;
 import africa.vote.SmartVote.datas.models.Poll;
+import africa.vote.SmartVote.datas.models.Result;
+import africa.vote.SmartVote.datas.models.Vote;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.PollService;
+import africa.vote.SmartVote.services.ResultService;
 import africa.vote.SmartVote.services.UserService;
+import africa.vote.SmartVote.services.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDateTime;
@@ -20,10 +27,18 @@ public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
     private final UserService userService;
 
+    private final ResultService resultService;
+    private final VoteService voteService;
+
     @Autowired
-    public PollServiceImpl(PollRepository pollRepository, UserService userService) {
+    public PollServiceImpl(PollRepository pollRepository,
+                           UserService userService,
+                           ResultService resultService,
+                           VoteService voteService) {
         this.pollRepository = pollRepository;
         this.userService = userService;
+        this.resultService = resultService;
+        this.voteService = voteService;
     }
 
     @Override
@@ -39,6 +54,11 @@ public class PollServiceImpl implements PollService {
         if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
         if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
         if (endDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll End date/time cant be before current date/time");
+        for (Candidate candidate: createPollRequest.getCandidates()) {
+            Result result = new Result();
+            result.setNoOfVotes(0L);
+            candidate.setResult(result);
+        }
         Poll poll = Poll.builder().
                 title(createPollRequest.getTitle())
                 .question(createPollRequest.getQuestion())
@@ -81,5 +101,32 @@ public class PollServiceImpl implements PollService {
                         getEndDateTime()
                         .isAfter(LocalDateTime.now()))
                 .toList();
+    }
+    @Transactional
+    @Override
+    public String vote(Long pollId, VoteRequest voteRequest) {
+        var userEmail = userService.getUserName();
+        var foundUser = userService.findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("User Not found"));
+
+        Poll foundPoll = pollRepository.findById(pollId).get();
+
+        for (Vote vote: voteService.findAllVotes()) {
+            boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getUsers().contains(foundUser) && vote.isVoted();
+            if (votedBefore)throw new GenericException("You cant vote twice");
+        }
+        List<Candidate> foundPollCandidates = foundPoll.getCandidates();
+        for (Candidate candidate: foundPollCandidates) {
+            if (candidate.getId().equals(voteRequest.getCandidateId())){
+                Long resultId = candidate.getResult().getId();
+                resultService.updateCandidateResult(resultId);
+                Vote vote = new Vote();
+                vote.getPolls().add(foundPoll);
+                vote.getUsers().add(foundUser);
+                vote.setVoted(true);
+                voteService.saveUserVote(vote);
+            }
+        }
+        return "You have successfully casted your vote";
     }
 }

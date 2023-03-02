@@ -6,15 +6,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Result {
+public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="no_of_votes", nullable = false, length = 255)
-    private Long noOfVotes;
+    @ManyToMany
+    @Column(name="poll_id", nullable = false)
+    private List<Poll> polls = new ArrayList<>();
+    @ManyToMany
+    @Column(name="user_id", nullable = false)
+    private List<User> users = new ArrayList<>();
+    private boolean voted;
 }
