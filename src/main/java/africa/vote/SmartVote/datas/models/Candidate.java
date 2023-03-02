@@ -17,7 +17,7 @@ public class Candidate {
     private Long id;
     @Column(name="name", nullable = false, length = 255)
     private String name;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "result", referencedColumnName = "id")
     private Result result;
 }

@@ -22,6 +22,7 @@ public class UserController {
     public UserService userService;
 
     @PostMapping("create")
+
     public ResponseEntity<?> createUser(@Valid @RequestBody TokenRequest tokenRequest,
                                         HttpServletRequest request) {
         var data = userService.createAccount(tokenRequest);
@@ -52,7 +53,7 @@ public class UserController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @PostMapping("forget-password")
+
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ResendTokenRequest tokenRequest,
                                                       HttpServletRequest httpServletRequest){
         var data = userService.sendOTP(tokenRequest);
