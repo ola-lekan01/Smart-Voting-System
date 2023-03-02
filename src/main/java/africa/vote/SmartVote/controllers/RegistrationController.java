@@ -25,6 +25,7 @@ public class RegistrationController {
     }
 
     @PostMapping("register")
+    @ResponseStatus
     public ResponseEntity<?> registration(@RequestBody @Valid RegistrationRequest registrationRequest,
                                           HttpServletRequest httpServletRequest) throws MessagingException {
 

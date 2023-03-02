@@ -3,6 +3,8 @@ package africa.vote.SmartVote.controllers;
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.PollService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping("api/v1/poll")
+@CrossOrigin("*")
 public class PollController {
     private final PollService pollService;
 
@@ -38,6 +41,7 @@ public class PollController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
+
     @GetMapping("/active")
     public ResponseEntity<?> activePolls(HttpServletRequest request) {
         var activePolls = pollService.activePolls();
@@ -51,6 +55,7 @@ public class PollController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
     @GetMapping("/recent")
     public ResponseEntity<?> recentPolls(HttpServletRequest request) {
         var recentPolls = pollService.recentPolls();
