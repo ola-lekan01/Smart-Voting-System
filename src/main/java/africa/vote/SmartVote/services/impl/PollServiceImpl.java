@@ -1,17 +1,24 @@
 package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
+import africa.vote.SmartVote.datas.dtos.requests.VoteRequest;
 import africa.vote.SmartVote.datas.enums.Category;
+import africa.vote.SmartVote.datas.models.Candidate;
 import africa.vote.SmartVote.datas.models.Poll;
+import africa.vote.SmartVote.datas.models.Result;
+import africa.vote.SmartVote.datas.models.Vote;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.PollService;
+import africa.vote.SmartVote.services.ResultService;
 import africa.vote.SmartVote.services.UserService;
+import africa.vote.SmartVote.services.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -20,10 +27,18 @@ public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
     private final UserService userService;
 
+    private final ResultService resultService;
+    private final VoteService voteService;
+
     @Autowired
-    public PollServiceImpl(PollRepository pollRepository, UserService userService) {
+    public PollServiceImpl(PollRepository pollRepository,
+                           UserService userService,
+                           ResultService resultService,
+                           VoteService voteService) {
         this.pollRepository = pollRepository;
         this.userService = userService;
+        this.resultService = resultService;
+        this.voteService = voteService;
     }
 
     @Override
@@ -31,31 +46,24 @@ public class PollServiceImpl implements PollService {
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("User Not found"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        "2023-04-01 08:00:00 24hrs"
+        LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest.getStartDateTime(), formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest.getEndDateTime(), formatter);
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
-
-        //2023-04-01
-        LocalDate startDate = LocalDate.parse(createPollRequest.getStartDate(), dateFormatter);
-        LocalDate endDate = LocalDate.parse(createPollRequest.getEndDate(), dateFormatter);
-        //"10:30:00 AM"
-        LocalTime startTime = LocalTime.parse(createPollRequest.getStartTime(), timeFormatter);
-        LocalTime endTime = LocalTime.parse(createPollRequest.getEndTime(), timeFormatter);
-
-        if (endDate.isBefore(startDate))throw new GenericException("End date cant be before start start");
-        if (endTime.isBefore(startTime))throw new GenericException("End time cant be before start time");
-        if (endTime.equals(startTime))throw new GenericException("End time and start time cant be same");
-        if (startDate.isBefore(LocalDate.now()))throw new GenericException("Poll start date cant be before current time");
-        if (startTime.isBefore(LocalTime.now()))throw new GenericException("Poll start time cant be before current time");
-        if (endDate.isBefore(LocalDate.now()))throw new GenericException("End date cant be before current date");
-        if (endTime.isBefore(LocalTime.now()))throw new GenericException("End time cant be before current time");
+        if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
+        if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
+        if (endDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll End date/time cant be before current date/time");
+        for (Candidate candidate: createPollRequest.getCandidates()) {
+            Result result = new Result();
+            result.setNoOfVotes(0L);
+            candidate.setResult(result);
+        }
         Poll poll = Poll.builder().
                 title(createPollRequest.getTitle())
                 .question(createPollRequest.getQuestion())
-                .startDate(startDate)
-                .startTime(startTime)
-                .endDate(endDate)
-                .endTime(endTime)
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
                 .candidates(createPollRequest.getCandidates())
                 .category(Category.getCategory(createPollRequest.getCategory()))
                 .users(foundUser)
@@ -66,12 +74,12 @@ public class PollServiceImpl implements PollService {
 
     @Override
     public List<Poll> recentPolls() {
-        return pollRepository.findAll().stream().filter(poll -> (poll.getEndDate()
-                .isBefore(LocalDate.now()) &&
-                poll.getEndTime().isBefore(LocalTime.now())) ||
-                (poll.getEndDate().equals(LocalDate.now()) &&
-                poll.getEndTime().isBefore(LocalTime.now()))
-                ).toList();
+        return pollRepository.findAll()
+                .stream()
+                .filter(poll -> poll
+                        .getEndDateTime()
+                        .isBefore(LocalDateTime.now()))
+                .toList();
     }
     @Override
     public List<Poll> activePolls() {
@@ -80,12 +88,45 @@ public class PollServiceImpl implements PollService {
                 .orElseThrow(()-> new GenericException("User Not found"));
 
         return pollRepository.findAll()
-                .stream().filter(poll -> (poll.getEndTime().isAfter(LocalTime.now())
-                && poll.getEndDate().isAfter(LocalDate.now())
-                        &&poll.getCategory().equals(foundUser.getCategory()))
-                ||(poll.getEndTime().isAfter(LocalTime.now())
-                        && poll.getEndDate().equals(LocalDate.now())
-                                &&poll.getCategory().equals(foundUser.getCategory()))
-                ).toList();
+                .stream()
+                .filter(poll -> (poll
+                        .getStartDateTime()
+                        .equals(LocalDateTime.now())
+                ||poll
+                        .getStartDateTime()
+                        .isBefore(LocalDateTime.now()))
+                && poll.getCategory()
+                        .equals(foundUser.getCategory())
+                && poll.
+                        getEndDateTime()
+                        .isAfter(LocalDateTime.now()))
+                .toList();
+    }
+    @Transactional
+    @Override
+    public String vote(Long pollId, VoteRequest voteRequest) {
+        var userEmail = userService.getUserName();
+        var foundUser = userService.findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("User Not found"));
+
+        Poll foundPoll = pollRepository.findById(pollId).get();
+
+        for (Vote vote: voteService.findAllVotes()) {
+            boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getUsers().contains(foundUser) && vote.isVoted();
+            if (votedBefore)throw new GenericException("You cant vote twice");
+        }
+        List<Candidate> foundPollCandidates = foundPoll.getCandidates();
+        for (Candidate candidate: foundPollCandidates) {
+            if (candidate.getId().equals(voteRequest.getCandidateId())){
+                Long resultId = candidate.getResult().getId();
+                resultService.updateCandidateResult(resultId);
+                Vote vote = new Vote();
+                vote.getPolls().add(foundPoll);
+                vote.getUsers().add(foundUser);
+                vote.setVoted(true);
+                voteService.saveUserVote(vote);
+            }
+        }
+        return "You have successfully casted your vote";
     }
 }
