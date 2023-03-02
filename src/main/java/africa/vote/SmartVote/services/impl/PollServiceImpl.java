@@ -69,11 +69,17 @@ public class PollServiceImpl implements PollService {
 
         return pollRepository.findAll()
                 .stream()
-                .filter(poll -> poll
-                        .getEndDateTime()
-                        .isAfter(LocalDateTime.now())
+                .filter(poll -> (poll
+                        .getStartDateTime()
+                        .equals(LocalDateTime.now())
+                ||poll
+                        .getStartDateTime()
+                        .isBefore(LocalDateTime.now()))
                 && poll.getCategory()
-                        .equals(foundUser.getCategory()))
+                        .equals(foundUser.getCategory())
+                && poll.
+                        getEndDateTime()
+                        .isAfter(LocalDateTime.now()))
                 .toList();
     }
 }
