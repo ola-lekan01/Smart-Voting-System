@@ -16,8 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Vote {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     @ManyToMany
     @Column(name="poll_id", nullable = false)
     private List<Poll> polls = new ArrayList<>();
