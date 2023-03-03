@@ -244,7 +244,47 @@ axios(config)
     "successful": true
 }
 ```
+# Delete User End Point
+1. This endpoint deletes a User from the Database
+2. The Method is a Delete Method that takes a Token in the Header
 
+```
+const axios = require('axios');
+
+let config = {
+  method: 'delete',
+maxBodyLength: Infinity,
+  url: 'https://africa-smart.onrender.com/api/v1/delete',
+  headers: { 
+    'Authorization': 'Bearer <Json Web Token>'
+  }
+};
+
+axios(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+
+```
+
+# Delete User Endpoint Response 
+
+*This is a sample of the response from the Delete User Endpoint for development Mode alone !!!*
+
+```
+{
+    "timestamp": "2023-03-03 || 17:05:10",
+    "status": "OK",
+    "data": {
+        "data": "User Deleted Successfully"
+    },
+    "path": "/api/v1/delete",
+    "successful": true
+}
+```
 
 # Create a Poll
 *To create a Poll End-point*

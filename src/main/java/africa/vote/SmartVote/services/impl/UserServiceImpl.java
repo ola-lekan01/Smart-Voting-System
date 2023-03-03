@@ -125,4 +125,15 @@ public class UserServiceImpl implements UserService {
     public String getUserName() {
         return jwtService.getUserName();
     }
+
+    @Override
+    public ApiData deleteUser() {
+        var userEmail = getUserName();
+        var foundUser = findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("User Not found"));
+        userRepository.delete(foundUser);
+        return ApiData.builder()
+                .data("User Deleted Successfully")
+                .build();
+    }
 }
