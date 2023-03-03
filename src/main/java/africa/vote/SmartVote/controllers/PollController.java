@@ -2,6 +2,7 @@ package africa.vote.SmartVote.controllers;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.dtos.requests.VoteRequest;
+import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.PollService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,10 +28,10 @@ public class PollController {
     public ResponseEntity<?> createPoll(@Valid @RequestBody CreatePollRequest createPollRequest,
                                         HttpServletRequest request) {
 
-        String createdPoll = pollService.createPoll(createPollRequest);
+        var data = pollService.createPoll(createPollRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(createdPoll)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)
@@ -42,10 +43,10 @@ public class PollController {
     @GetMapping("active")
 
     public ResponseEntity<?> activePolls(HttpServletRequest request) {
-        var activePolls = pollService.activePolls();
+        var data = pollService.activePolls();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(activePolls)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)
@@ -55,10 +56,10 @@ public class PollController {
     }
     @GetMapping("recent")
     public ResponseEntity<?> recentPolls(HttpServletRequest request) {
-        var recentPolls = pollService.recentPolls();
+        var data = pollService.recentPolls();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(recentPolls)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)
@@ -67,13 +68,14 @@ public class PollController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @PutMapping("vote/{poll_id}")
-    public ResponseEntity<?> vote(@PathVariable("poll_id") Long pollId, @Valid @RequestBody VoteRequest voteRequest,
+    public ResponseEntity<?> vote(@PathVariable("poll_id") String pollId,
+                                  @Valid @RequestBody VoteRequest voteRequest,
                                   HttpServletRequest request) {
 
-        String vote = pollService.vote(pollId, voteRequest);
+        var data = pollService.vote(pollId, voteRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .data(vote)
+                .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(request.getRequestURI())
                 .isSuccessful(true)

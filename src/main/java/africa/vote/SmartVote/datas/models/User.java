@@ -24,8 +24,8 @@ import java.util.List;
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     @Column(name="first_name", nullable = false, length = 100)
     private String firstName;
     @Column(name="last_name", length = 100)

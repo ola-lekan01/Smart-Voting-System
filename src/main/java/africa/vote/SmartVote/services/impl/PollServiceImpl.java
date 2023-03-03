@@ -2,6 +2,7 @@ package africa.vote.SmartVote.services.impl;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.dtos.requests.VoteRequest;
+import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.enums.Category;
 import africa.vote.SmartVote.datas.models.Candidate;
 import africa.vote.SmartVote.datas.models.Poll;
@@ -42,7 +43,7 @@ public class PollServiceImpl implements PollService {
     }
 
     @Override
-    public String createPoll(CreatePollRequest createPollRequest) {
+    public ApiData createPoll(CreatePollRequest createPollRequest) {
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("User Not found"));
@@ -69,7 +70,9 @@ public class PollServiceImpl implements PollService {
                 .users(foundUser)
                 .build();
         pollRepository.save(poll);
-        return "Poll Successfully created";
+        return ApiData.builder()
+                .data("Poll Successfully Created!!! ")
+                .build();
     }
 
     @Override
@@ -104,21 +107,23 @@ public class PollServiceImpl implements PollService {
     }
     @Transactional
     @Override
-    public String vote(Long pollId, VoteRequest voteRequest) {
+    public ApiData vote(String pollId, VoteRequest voteRequest) {
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("User Not found"));
 
-        Poll foundPoll = pollRepository.findById(pollId).get();
+        Poll foundPoll = pollRepository.findById(pollId)
+                .orElseThrow(()-> new GenericException("Poll Id Does not Exist! "));
 
         for (Vote vote: voteService.findAllVotes()) {
             boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getUsers().contains(foundUser) && vote.isVoted();
             if (votedBefore)throw new GenericException("You cant vote twice");
         }
         List<Candidate> foundPollCandidates = foundPoll.getCandidates();
+
         for (Candidate candidate: foundPollCandidates) {
             if (candidate.getId().equals(voteRequest.getCandidateId())){
-                Long resultId = candidate.getResult().getId();
+                String resultId = candidate.getResult().getId();
                 resultService.updateCandidateResult(resultId);
                 Vote vote = new Vote();
                 vote.getPolls().add(foundPoll);
@@ -127,6 +132,8 @@ public class PollServiceImpl implements PollService {
                 voteService.saveUserVote(vote);
             }
         }
-        return "You have successfully casted your vote";
+        return ApiData.builder()
+                .data("You have successfully casted your vote!!! ")
+                .build();
     }
 }

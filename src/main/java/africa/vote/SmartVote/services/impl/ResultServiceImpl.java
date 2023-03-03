@@ -11,7 +11,7 @@ public class ResultServiceImpl implements ResultService {
     @Autowired
     private ResultRepository resultRepository;
     @Override
-    public void updateCandidateResult(Long resultId) {
+    public void updateCandidateResult(String resultId) {
         Result foundResult = resultRepository.findById(resultId).get();
         foundResult.setNoOfVotes(foundResult
                 .getNoOfVotes() + 1);

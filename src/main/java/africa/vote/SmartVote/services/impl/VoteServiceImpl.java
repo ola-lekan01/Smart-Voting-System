@@ -16,9 +16,8 @@ public class VoteServiceImpl implements VoteService {
     public void saveUserVote(Vote vote) {
         voteRepository.save(vote);
     }
-
     @Override
-    public Vote findVoteById(Long voteId) {
+    public Vote findVoteById(String voteId) {
         return voteRepository.findById(voteId).get();
     }
 
