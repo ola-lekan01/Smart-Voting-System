@@ -17,5 +17,6 @@ public interface UserService {
     ApiData authenticate(LoginRequest request);
     Optional<User> getById(String userId);
     String getUserName();
+    ApiData deleteUser();
 }
 

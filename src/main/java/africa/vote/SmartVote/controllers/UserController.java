@@ -17,8 +17,13 @@ import java.time.ZonedDateTime;
 @RestController
 @RequestMapping("/api/v1/user/")
 public class UserController {
+
+    public final UserService userService;
+
     @Autowired
-    public UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("create")
 

@@ -2,7 +2,6 @@ package africa.vote.SmartVote.controllers;
 
 import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.dtos.requests.VoteRequest;
-import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.PollService;
 import jakarta.servlet.http.HttpServletRequest;
