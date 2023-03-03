@@ -47,7 +47,7 @@ public class PollServiceImpl implements PollService {
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("User Not found"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        "2023-04-01 08:00:00 24hrs"
+//       "2023-04-01 08:00:00 24hrs"
         LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest.getStartDateTime(), formatter);
         LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest.getEndDateTime(), formatter);
 
@@ -92,7 +92,7 @@ public class PollServiceImpl implements PollService {
                 .filter(poll -> (poll
                         .getStartDateTime()
                         .equals(LocalDateTime.now())
-                ||poll
+                || poll
                         .getStartDateTime()
                         .isBefore(LocalDateTime.now()))
                 && poll.getCategory()
@@ -113,7 +113,7 @@ public class PollServiceImpl implements PollService {
 
         for (Vote vote: voteService.findAllVotes()) {
             boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getUsers().contains(foundUser) && vote.isVoted();
-            if (votedBefore)throw new GenericException("You cant vote twice");
+            if (votedBefore)throw new GenericException("You can't vote twice");
         }
         List<Candidate> foundPollCandidates = foundPoll.getCandidates();
         for (Candidate candidate: foundPollCandidates) {

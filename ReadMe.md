@@ -26,7 +26,7 @@ axios(config)
 });
 
 ```
-```agsl
+```
     SIGN OUT ENDPOINT
     var axios = require('axios');
 var data = JSON.stringify({
