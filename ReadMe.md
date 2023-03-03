@@ -1,14 +1,18 @@
-```
-REGISTRATION ENDPOINT
+# REGISTRATION ENDPOINT
 
+```
 const axios = require('axios');
 let data = JSON.stringify({
-  "firstName": "Lekan",
-  "lastName": "Daniel",
+  "firstName": "Lekan", // This field is required
+  "lastName": "Daniel", // This field is optional
   "email": "gab.oyinlola@gmail.com",
+  // email field is required with a correct email format
   "phoneNumber": "08069580949",
+  // Phone number field is required with a correct Nigerian phoneNumber format
   "password": "Test123!@#",
+  // Password field is required with at least 8 caracters, 1 uppercase caracter, 1 lowercase caracter and 1 symbol
   "category": "COHORT_III"
+  // Category field is required with a list of the available voting category available
 });
 
 let config = {
@@ -30,9 +34,8 @@ axios(config)
 });
 ```
 
+# Response from Registration End-Point
 ```
-Response from Registration End-Point
-
 {
     "timestamp": "2023-03-03 || 11:03:56",
     "status": "CREATED",
@@ -44,13 +47,12 @@ Response from Registration End-Point
 }
 ```
 
+# Create User End Point
 ```
-Create User End Point
-
 const axios = require('axios');
 let data = JSON.stringify({
-  "token": "1268",
-  "email": "gab.oyinlola@gmail.com"
+  "token": "1268", // This field is required
+  "email": "gab.oyinlola@gmail.com" // This field is required
 });
 
 let config = {
@@ -72,9 +74,8 @@ axios(config)
 });
 ```
 
+# Response from Create User EndPoint
 ```
-Response from Create User EndPoint
-
 {
     "timestamp": "2023-03-03 || 11:08:17",
     "status": "OK",
@@ -86,12 +87,12 @@ Response from Create User EndPoint
 }
 ```
 
+# Login in User EndPoint
 ```
-Login in User EndPoint
 const axios = require('axios');
 let data = JSON.stringify({
-  "email": "gab.oyinlola@gmail.com",
-  "password": "Test123!@#"
+  "email": "gab.oyinlola@gmail.com", // This field is required
+  "password": "Test123!@#" // This field is required
 });
 
 let config = {
@@ -113,8 +114,8 @@ axios(config)
 });
 ```
 
+# Response from Login User EndPoint
 ```
-Response from Login User EndPoint
 {
     "timestamp": "2023-03-03 || 11:08:17",
     "status": "OK",
@@ -125,8 +126,8 @@ Response from Login User EndPoint
     "successful": true
 }
 ```
+# Resend Token EndPoint
 ```
-Resend Token EndPoint
 const axios = require('axios');
 let data = JSON.stringify({
   "email": "gab.oyinlola@gmail.com"
@@ -151,8 +152,8 @@ axios(config)
 });
 ```
 
+# Response from Resend Token Endpoint
 ```
-Response from Resend Token Endpoint
 {
   "timestamp": "2023-03-03 || 11:15:19",
   "status": "OK",
