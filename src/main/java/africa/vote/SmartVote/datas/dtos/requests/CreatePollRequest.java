@@ -15,12 +15,8 @@ public class CreatePollRequest {
     private String question;
     @NotBlank(message = "This field Cannot be Blank")
     private String startDateTime;
-//    @NotBlank(message = "This field Cannot be Blank")
-//    private String startTime;
     @NotBlank(message = "This field Cannot be Blank")
     private String endDateTime;
-//    @NotBlank(message = "This field Cannot be Blank")
-//    private String endTime;
     @NotBlank(message = "This field Cannot be Blank")
     private String category;
     @NotEmpty(message = "This field Cannot be Blank")
