@@ -10,6 +10,5 @@ public interface PollService {
     String createPoll(CreatePollRequest createPollRequest);
     List<Poll> recentPolls();
     List<Poll>activePolls();
-
     String vote(Long pollId, VoteRequest voteRequest);
 }

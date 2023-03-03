@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.ZonedDateTime;
 
 @RestController
-@RequestMapping("api/v1/poll/")
+@RequestMapping("/api/v1/poll/")
 public class PollController {
     private final PollService pollService;
 
@@ -40,6 +40,7 @@ public class PollController {
     }
 
     @GetMapping("active")
+
     public ResponseEntity<?> activePolls(HttpServletRequest request) {
         var activePolls = pollService.activePolls();
         ApiResponse apiResponse = ApiResponse.builder()
