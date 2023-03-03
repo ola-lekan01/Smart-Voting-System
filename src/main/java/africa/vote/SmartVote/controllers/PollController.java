@@ -15,7 +15,6 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping("/api/v1/poll/")
-@CrossOrigin("*")
 public class PollController {
     private final PollService pollService;
 
@@ -40,7 +39,7 @@ public class PollController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("/active")
+    @GetMapping("active")
 
     public ResponseEntity<?> activePolls(HttpServletRequest request) {
         var activePolls = pollService.activePolls();
@@ -54,7 +53,7 @@ public class PollController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
-    @GetMapping("/recent")
+    @GetMapping("recent")
     public ResponseEntity<?> recentPolls(HttpServletRequest request) {
         var recentPolls = pollService.recentPolls();
         ApiResponse apiResponse = ApiResponse.builder()
