@@ -40,7 +40,6 @@ public class User implements UserDetails {
     private Status status;
     @Enumerated(EnumType.STRING)
     private Category category;
-    private String imageUrl;
     @JsonIgnore
     private String password;
 
