@@ -5,6 +5,7 @@ import africa.vote.SmartVote.datas.dtos.requests.UploadImageRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.models.UserImage;
 import africa.vote.SmartVote.datas.repositories.UserImageRepository;
+import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,19 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ApiData uploadImage(UploadImageRequest uploadImageRequest) {
-        return null;
+    public ApiData uploadImage(Long id, UploadImageRequest uploadImageRequest) {
+        try{
+            UserImage foundImage =  userImageRepository.findById(id).orElseThrow(() -> new GenericException("Image not found"));
+            foundImage.setImage(uploadImageRequest.getFile().getBytes());
+            userImageRepository.save(foundImage);
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
+
+        return ApiData.builder()
+                .data("Image uploaded Successfully")
+                .build();
     }
 
     @Override
@@ -47,12 +59,16 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ApiData deleteImate() {
-        userImageRepository.findById()
+    public ApiData deleteImage(Long id) {
+        userImageRepository.findById(id);
+
+        return ApiData.builder()
+                .data("Image deleted successfully")
+                .build();
     }
 
     @Override
     public List<UserImage> getAllImages() {
-        return null;
+        return userImageRepository.findAll();
     }
 }

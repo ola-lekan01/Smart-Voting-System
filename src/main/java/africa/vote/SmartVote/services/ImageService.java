@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface ImageService {
     ApiData createImage(ImageCreationRequest imageCreationRequest) throws IOException;
-    ApiData uploadImage(UploadImageRequest uploadImageRequest);
+    ApiData uploadImage(Long id, UploadImageRequest uploadImageRequest);
     ApiData getImageById(Long id);
-    ApiData deleteImate();
+    ApiData deleteImage(Long id);
     List<UserImage> getAllImages();
 }
