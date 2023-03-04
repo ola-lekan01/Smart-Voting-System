@@ -11,11 +11,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JWTAuthenticationFilter JWTAuthFilter;
+    private final JWTAuthenticationFilter jWTAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private static final String[] AUTH_WHITELIST = {
             "/authenticate",
@@ -42,7 +43,8 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(JWTAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jWTAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling();
         return httpSecurity.build();
     }
 }

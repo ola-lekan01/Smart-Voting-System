@@ -46,23 +46,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiData createAccount(TokenRequest tokenRequest) {
-        TokenVerification(tokenRequest);
+        tokenVerification(tokenRequest);
         userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
         var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
                 .orElseThrow(() -> new GenericException("User Not found"));
         return ApiData.builder()
-                .data(jwtService.generateToken(foundUser))
+                .data(foundUser.getFirstName() + "User Verified Successfully")
                 .build();
     }
 
-
     @Override
-    public ApiData sendOTP(ResendTokenRequest resendTokenRequest) {
-        var user = userRepository.findByEmailIgnoreCase(resendTokenRequest.getEmail())
-                .orElseThrow(() -> new GenericException
-                        ("user with " + resendTokenRequest.getEmail() + " doesn't exist"));
-
-        return generateToken(resendTokenRequest, user);
+    public ApiData sendOTP(ResendTokenRequest tokenRequest) {
+        var foundUser = userRepository.findByEmailIgnoreCase(tokenRequest.getEmail())
+                .orElseThrow(() -> new GenericException("User with " + tokenRequest.getEmail() + " not found"));
+        return generateToken(tokenRequest, foundUser);
     }
 
 
@@ -75,7 +72,7 @@ public class UserServiceImpl implements UserService {
             var foundUserOTP = tokenRepository.findByUserId(savedUser.getId()).get();
             foundUserOTP.setToken(generateToken);
             foundUserOTP.setCreatedTime(LocalDateTime.now());
-            foundUserOTP.setConfirmedTime(LocalDateTime.now().plusMinutes(10));
+            foundUserOTP.setExpiredTime(LocalDateTime.now().plusMinutes(10));
             foundUserOTP.setUser(savedUser);
             tokenRepository.save(foundUserOTP);
         }
@@ -88,14 +85,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void TokenVerification(TokenRequest tokenRequest) {
+    public ApiData tokenVerification(TokenRequest tokenRequest) {
+        var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
+                .orElseThrow(()-> new GenericException("User Does not Exist"));
         Token foundToken = tokenRepository.findByToken(tokenRequest.getToken()).
                 orElseThrow(() -> new GenericException("Token doesn't exist"));
 
+        if(! Objects.equals(tokenRequest.getToken(), foundToken.getToken())) throw new GenericException("OTP isn't correct");
         if(foundToken.getExpiredTime().isBefore(LocalDateTime.now())) throw new GenericException("OTP already expired");
-        if(foundToken.getConfirmedTime() != null) throw new GenericException("OTP has already been used");
-        if(!Objects.equals(tokenRequest.getToken(), foundToken.getToken())) throw new GenericException("OTP isn't correct");
+        if(! Objects.equals(foundToken.getUser(), foundUser)) throw new GenericException("Invalid Token");
         tokenRepository.setConfirmedAt(LocalDateTime.now(), foundToken.getId());
+        tokenRepository.delete(foundToken);
+
+        return ApiData.builder()
+                .data("Token Verified")
+                .build();
     }
 
     @Override
@@ -103,18 +107,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmailIgnoreCase(email);
     }
 
-    @Override
-    public ApiData resendOTP(ResendTokenRequest tokenRequest) {
-        var foundUser = userRepository.findByEmailIgnoreCase(tokenRequest.getEmail())
-                .orElseThrow(() -> new GenericException("User with " + tokenRequest.getEmail() + " not found"));
-
-        if(Objects.equals(tokenRequest.getEmail(), foundUser.getEmail())){
-            generateToken(tokenRequest, foundUser);
-        }
-        return ApiData.builder()
-                .data("Token sent to " + tokenRequest.getEmail())
-                .build();
-    }
 
     @Override
     public ApiData authenticate(LoginRequest request) {
@@ -125,7 +117,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
     @Override
-    public Optional<User> getById(Long userId) {
+    public Optional<User> getById(String userId) {
         return userRepository.findById(userId);
     }
 
@@ -134,5 +126,14 @@ public class UserServiceImpl implements UserService {
         return jwtService.getUserName();
     }
 
-
+    @Override
+    public ApiData deleteUser() {
+        var userEmail = getUserName();
+        var foundUser = findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("User Not found"));
+        userRepository.delete(foundUser);
+        return ApiData.builder()
+                .data("User Deleted Successfully")
+                .build();
+    }
 }

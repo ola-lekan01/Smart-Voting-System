@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface VoteService {
     void saveUserVote(Vote vote);
-    Vote findVoteById(Long voteId);
+    Vote findVoteById(String voteId);
     List<Vote> findAllVotes();
 }
 

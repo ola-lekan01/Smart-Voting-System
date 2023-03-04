@@ -16,10 +16,14 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping("/api/v1/user/")
-@CrossOrigin("*")
 public class UserController {
+
+    public final UserService userService;
+
     @Autowired
-    public UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("create")
     public ResponseEntity<?> createUser(@Valid @RequestBody TokenRequest tokenRequest,
@@ -40,7 +44,7 @@ public class UserController {
     public ResponseEntity<?> resendToken(@Valid @RequestBody ResendTokenRequest tokenRequest,
                                          HttpServletRequest request){
 
-        var data = userService.resendOTP(tokenRequest);
+        var data = userService.sendOTP(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
                 .data(data)
@@ -52,10 +56,10 @@ public class UserController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
-    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ResendTokenRequest tokenRequest,
-                                                      HttpServletRequest httpServletRequest){
-        var data = userService.sendOTP(tokenRequest);
+    @PostMapping("login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                            HttpServletRequest httpServletRequest){
+        var data = userService.authenticate(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK)
                 .data(data)
@@ -67,12 +71,12 @@ public class UserController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
-                                            HttpServletRequest httpServletRequest){
-        var data = userService.authenticate(request);
+    @PostMapping("verify")
+    public ResponseEntity<?> verify(@Valid @RequestBody TokenRequest tokenRequest,
+                                   HttpServletRequest httpServletRequest){
+        var data = userService.tokenVerification(tokenRequest);
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.ACCEPTED)
                 .data(data)
                 .timestamp(ZonedDateTime.now())
                 .path(httpServletRequest.getRequestURI())

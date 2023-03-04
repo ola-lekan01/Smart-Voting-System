@@ -11,12 +11,12 @@ import java.util.Optional;
 public interface UserService {
     void saveUser(User user);
     ApiData createAccount(TokenRequest tokenRequest);
-    ApiData sendOTP(ResendTokenRequest resendTokenRequest);
-    void TokenVerification(TokenRequest tokenRequest);
+    ApiData tokenVerification(TokenRequest tokenRequest);
     Optional<User> findByEmailIgnoreCase(String email);
-    ApiData resendOTP(ResendTokenRequest tokenRequest);
+    ApiData sendOTP(ResendTokenRequest tokenRequest);
     ApiData authenticate(LoginRequest request);
-    Optional<User> getById(Long userId);
+    Optional<User> getById(String userId);
     String getUserName();
+    ApiData deleteUser();
 }
 

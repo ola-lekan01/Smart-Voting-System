@@ -9,14 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 @Transactional
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmailIgnoreCase(String email);
     @Modifying
     @Query("UPDATE User user " +
             "SET user.status = ?1 " +
             "WHERE user.email = ?2")
     void verifyUser(Status verify, String email);
-//    @Modifying
-////    @Query("DELETE FROM Users user WHERE user.status = ")
-//    void deleteUnverifiedAccount();
 }

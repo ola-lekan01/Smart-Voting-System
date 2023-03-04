@@ -15,6 +15,6 @@ public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="no_of_votes", nullable = false)
+    @Column(name="no_of_votes", nullable = false, length = 255)
     private Long noOfVotes;
 }
