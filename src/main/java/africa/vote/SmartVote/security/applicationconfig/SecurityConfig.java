@@ -1,6 +1,7 @@
 package africa.vote.SmartVote.security.applicationconfig;
 
 import africa.vote.SmartVote.security.config.JWTAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +45,11 @@ public class SecurityConfig {
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jWTAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling();
+                .exceptionHandling()
+                .authenticationEntryPoint((req, res, exception) ->
+                        res.sendError(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED, exception.getMessage()))
+                .accessDeniedHandler((req, res, exception)
+                        -> res.sendError(HttpServletResponse.SC_FORBIDDEN, exception.getMessage()));
         return httpSecurity.build();
     }
 }
