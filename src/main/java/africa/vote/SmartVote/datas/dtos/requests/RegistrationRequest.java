@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class RegistrationRequest {
     @NotBlank(message = "This Field cannot be blank")
     private String firstName;
+    @NotBlank(message = "This field cannot be blank")
     private String lastName;
     @Email(message = "This field requires a valid email address")
     @NotBlank(message = "This Field cannot be blank")
@@ -23,6 +24,4 @@ public class RegistrationRequest {
     private String password;
     @NotBlank(message = "This Field cannot be blank")
     private String category;
-    @NotBlank(message = "This Field cannot be blank")
-    private String imageURL;
 }

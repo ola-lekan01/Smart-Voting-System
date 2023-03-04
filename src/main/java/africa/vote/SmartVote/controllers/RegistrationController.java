@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.ZonedDateTime;
 
 @RestController
-@RequestMapping("api/v1/registration/")
+@RequestMapping("/api/v1/registration/")
 public class RegistrationController {
     public final RegistrationService registrationService;
 
@@ -24,7 +24,6 @@ public class RegistrationController {
     }
 
     @PostMapping("register")
-    @ResponseStatus
     public ResponseEntity<?> registration(@RequestBody @Valid RegistrationRequest registrationRequest,
                                           HttpServletRequest httpServletRequest) throws MessagingException {
 

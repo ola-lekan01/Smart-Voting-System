@@ -36,7 +36,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .email(registrationRequest.getEmail().toLowerCase())
                 .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .category(Category.getCategory(registrationRequest.getCategory()))
-                .imageUrl(registrationRequest.getImageURL())
                 .status(UNVERIFIED)
                 .build();
         userService.saveUser(user);

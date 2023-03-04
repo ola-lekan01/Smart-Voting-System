@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Result {
+public class UserImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    @Column(name="no_of_votes", nullable = false)
-    private Long noOfVotes;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "image_name", nullable = false)
+    private String name;
+    @Lob
+    private byte[] image;
 }

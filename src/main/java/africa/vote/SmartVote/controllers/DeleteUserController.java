@@ -24,7 +24,7 @@ public class DeleteUserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> resendToken(HttpServletRequest request){
+    public ResponseEntity<?> deleteUser(HttpServletRequest request){
 
         var data = userService.deleteUser();
         ApiResponse apiResponse = ApiResponse.builder()
