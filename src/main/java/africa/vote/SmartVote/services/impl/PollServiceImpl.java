@@ -112,8 +112,7 @@ public class PollServiceImpl implements PollService {
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("User Not found"));
 
-        Poll foundPoll = pollRepository.findById(pollId)
-                .orElseThrow(()-> new GenericException("Poll Id Does not Exist! "));
+        Poll foundPoll = findPollById(pollId);
 
         for (Vote vote: voteService.findAllVotes()) {
             boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getUsers().contains(foundUser) && vote.isVoted();
@@ -135,5 +134,11 @@ public class PollServiceImpl implements PollService {
         return ApiData.builder()
                 .data("You have successfully casted your vote!!! ")
                 .build();
+    }
+
+    @Override
+    public Poll findPollById(String pollId) {
+        return pollRepository.findById(pollId)
+                .orElseThrow(()-> new GenericException("Poll Id Does not Exist! "));
     }
 }
