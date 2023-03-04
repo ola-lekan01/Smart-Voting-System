@@ -22,8 +22,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Poll {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     @Column(name="title", nullable = false, length = 255)
     private String title;
     @Column(name="question", nullable = false, length = 255)
