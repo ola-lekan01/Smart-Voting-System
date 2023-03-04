@@ -8,6 +8,7 @@ import africa.vote.SmartVote.datas.enums.Status;
 import africa.vote.SmartVote.datas.models.Token;
 import africa.vote.SmartVote.datas.models.User;
 import africa.vote.SmartVote.datas.repositories.TokenRepository;
+import africa.vote.SmartVote.datas.repositories.UserImageRepository;
 import africa.vote.SmartVote.datas.repositories.UserRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.security.config.JWTService;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static africa.vote.SmartVote.datas.enums.Status.UNVERIFIED;
 import static africa.vote.SmartVote.utils.EmailUtils.buildEmail;
 
 @Service
@@ -29,14 +31,17 @@ public class UserServiceImpl implements UserService {
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
     private final JWTService jwtService;
+    private final UserImageRepository userImageRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenRepository tokenRepository,
-                           EmailService emailService, JWTService jwtService) {
+                           EmailService emailService, JWTService jwtService,
+                           UserImageRepository userImageRepository) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
         this.jwtService = jwtService;
+        this.userImageRepository = userImageRepository;
     }
 
     @Override
@@ -135,5 +140,23 @@ public class UserServiceImpl implements UserService {
         return ApiData.builder()
                 .data("User Deleted Successfully")
                 .build();
+    }
+
+    @Override
+    public void deleteToken() {
+        tokenRepository.deleteTokenByConfirmedTimeIsBefore(LocalDateTime.now());
+
+    }
+
+    @Override
+    public void deleteUnverifiedUsers() {
+        userRepository.deleteUnverifiedUsers(UNVERIFIED);
+    }
+
+    @Override
+    public void tokenUpdatedForDeletedUser() {
+        String userEmail = getUserName();
+        User userId = tokenRepository.findByUserId(userEmail).get().getUser();
+        tokenRepository.updateTokenForDeletedUnverifiedUsers(userId);
     }
 }

@@ -24,6 +24,4 @@ public class RegistrationRequest {
     private String password;
     @NotBlank(message = "This Field cannot be blank")
     private String category;
-    @NotBlank(message = "This Field cannot be blank")
-    private String imageURL;
 }

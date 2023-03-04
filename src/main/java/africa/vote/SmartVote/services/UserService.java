@@ -18,5 +18,8 @@ public interface UserService {
     Optional<User> getById(String userId);
     String getUserName();
     ApiData deleteUser();
+    void deleteToken();
+    void deleteUnverifiedUsers();
+    void tokenUpdatedForDeletedUser();
 }
 
