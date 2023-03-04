@@ -123,8 +123,8 @@ public class PollServiceImpl implements PollService {
 
         for (Candidate candidate: foundPollCandidates) {
             if (candidate.getId().equals(voteRequest.getCandidateId())){
-//                String resultId = candidate.getResult().getId();
-//                resultService.updateCandidateResult(resultId);
+                String resultId = candidate.getResult().getId();
+                resultService.updateCandidateResult(resultId);
                 Vote vote = new Vote();
                 vote.getPolls().add(foundPoll);
                 vote.getUsers().add(foundUser);

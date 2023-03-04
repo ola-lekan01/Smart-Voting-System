@@ -145,7 +145,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteToken() {
         tokenRepository.deleteTokenByConfirmedTimeIsBefore(LocalDateTime.now());
-
     }
 
     @Override
@@ -157,6 +156,7 @@ public class UserServiceImpl implements UserService {
     public void tokenUpdatedForDeletedUser() {
         String userEmail = getUserName();
         User userId = tokenRepository.findByUserId(userEmail).get().getUser();
+        System.out.println(userId);
         tokenRepository.updateTokenForDeletedUnverifiedUsers(userId);
     }
 }

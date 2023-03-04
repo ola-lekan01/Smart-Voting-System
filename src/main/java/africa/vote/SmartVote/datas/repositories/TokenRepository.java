@@ -29,4 +29,9 @@ public interface TokenRepository extends JpaRepository<Token, String> {
             "SET token.user = NULL " +
             "WHERE token.user = :deleted_Id")
     void updateTokenForDeletedUnverifiedUsers(User deleted_Id);
+
+    @Modifying
+    @Query("DELETE FROM Token token " +
+            "WHERE token.confirmedTime = NULL")
+    void deleteUnconfirmedToken();
 }

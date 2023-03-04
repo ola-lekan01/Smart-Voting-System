@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.services.impl;
 
+import africa.vote.SmartVote.datas.repositories.TokenRepository;
 import africa.vote.SmartVote.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +14,23 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class DeleteScheduler {
     @Autowired
     private UserService userService;
+    private final TokenRepository tokenRepository;
 
-    @Scheduled(cron = "0 */10 * * * *")
+    // Clear confirmed token from the token repo every 24hrs
+    @Scheduled(cron = "0 0 0/24 * * ?")
     public void deleteToken(){
-        System.out.println("Deleted");
         userService.deleteToken();
     }
 
-    @Scheduled(cron = "0 */3 * * * *")
+    // Clear all unverified users after 5 days
+    @Scheduled(cron = "0 0 0 */5 * *")
     public void deleteUnverifiedUser(){
-        System.out.println("user deleted");
-        userService.tokenUpdatedForDeletedUser();
         userService.deleteUnverifiedUsers();
+    }
+
+    // Clear unused token after 2 days
+    @Scheduled(cron = "0 0 0 */2 * *")
+    public void deleteUnconfirmedToken(){
+        tokenRepository.deleteUnconfirmedToken();
     }
 }
