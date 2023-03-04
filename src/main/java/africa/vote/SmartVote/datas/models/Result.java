@@ -15,6 +15,6 @@ public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @Column(name="no_of_votes", nullable = false, length = 255)
+    @Column(name="no_of_votes", nullable = false)
     private Long noOfVotes;
 }

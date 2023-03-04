@@ -15,7 +15,7 @@ public class Candidate {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @Column(name="name", nullable = false, length = 255)
+    @Column(name="name", nullable = false)
     private String name;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "result", referencedColumnName = "id")
