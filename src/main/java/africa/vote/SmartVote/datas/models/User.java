@@ -43,6 +43,8 @@ public class User implements UserDetails {
     private String imageUrl;
     @JsonIgnore
     private String password;
+    @JsonIgnore
+    private boolean isEnabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -74,8 +76,12 @@ public class User implements UserDetails {
         return true;
     }
 
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }

@@ -47,9 +47,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiData createAccount(TokenRequest tokenRequest) {
         tokenVerification(tokenRequest);
-        userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
         var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
                 .orElseThrow(() -> new GenericException("User Not found"));
+        userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
+        foundUser.setEnabled(true);
         return ApiData.builder()
                 .data(foundUser.getFirstName() + "User Verified Successfully")
                 .build();

@@ -1,7 +1,8 @@
 package africa.vote.SmartVote.security.config;
 
 import africa.vote.SmartVote.exeptions.GenericException;
-import io.jsonwebtoken.JwtException;
+import africa.vote.SmartVote.exeptions.JwtException;
+import africa.vote.SmartVote.exeptions.UsernameNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
