@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ```
 REGISTRATION ENDPOINT
 
@@ -13,7 +13,7 @@ var config = {
   url: 'http://localhost:8080/api/v1/poll/recent',
   headers: { 
     'Content-Type': 'application/json', 
-    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsZWthbi5zb2Z1eWkxQGdtYWlsLmNvbSIsImlhdCI6MTY3Nzc2MzM3NCwiZXhwIjoxNjc3NzY0ODE0fQ.7ERohFa2wya1BxxfElFSt2RbiXL00oh-srfy88q48i0'
+    'Authorization': 'Bearer 2RbiXL00oh-srfy88q48i0'
 =======
 # REGISTRATION ENDPOINT
 *For New Users*
@@ -117,11 +117,7 @@ let config = {
 maxBodyLength: Infinity,
   url: 'https://africa-smart.onrender.com/api/v1/user/create',
   headers: { 
-    'Content-Type': 'application/json'
->>>>>>> in-dev
-  },
-  data : data
-};
+    'Content-Type': 'application/json'~~~~
 
 axios(config)
 <<<<<<< HEAD
@@ -544,5 +540,3 @@ axios(config)
     "path": "/api/v1/poll/vote/1",
     "successful": true
 }
->>>>>>> in-dev
-```
