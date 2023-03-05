@@ -12,4 +12,5 @@ public interface PollService {
     List<Poll> recentPolls();
     List<Poll>activePolls();
     ApiData vote(String pollId, VoteRequest voteRequest);
+    Poll findPollById(String pollId);
 }
