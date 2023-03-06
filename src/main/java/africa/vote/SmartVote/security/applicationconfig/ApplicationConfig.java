@@ -23,7 +23,7 @@ public class ApplicationConfig {
         return username -> userRepository
                 .findByEmailIgnoreCase(username)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User Not found"));
+                        new UsernameNotFoundException("AppUser Not found"));
     }
     @Bean
     public AuthenticationProvider authenticationProvider(){

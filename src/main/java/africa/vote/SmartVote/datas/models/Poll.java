@@ -1,18 +1,14 @@
 package africa.vote.SmartVote.datas.models;
 
 import africa.vote.SmartVote.datas.enums.Category;
-import africa.vote.SmartVote.datas.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -35,7 +31,7 @@ public class Poll {
     @JsonIgnore
     @JoinColumn(name = "app_user", referencedColumnName = "id")
     @ManyToOne
-    private User users;
+    private AppUser users;
     @Enumerated(EnumType.STRING)
     private Category category;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

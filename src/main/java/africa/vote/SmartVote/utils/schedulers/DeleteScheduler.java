@@ -14,7 +14,7 @@ public class DeleteScheduler {
     private final AppScheduler scheduled;
 
 
-    // Clear all unverified users after 5 days
+    // Clear all unverified appUsers after 5 days
     @Scheduled(cron = "0 0 0 */5 * *")
     public void deleteUnverifiedUser(){
         scheduled.deleteUnverifiedUsers();

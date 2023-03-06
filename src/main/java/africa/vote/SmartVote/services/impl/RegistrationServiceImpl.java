@@ -4,7 +4,7 @@ import africa.vote.SmartVote.datas.dtos.requests.RegistrationRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.enums.Category;
-import africa.vote.SmartVote.datas.models.User;
+import africa.vote.SmartVote.datas.models.AppUser;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.RegistrationService;
 import africa.vote.SmartVote.services.UserService;
@@ -29,8 +29,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public ApiData register(RegistrationRequest registrationRequest) {
         if(userService.findByEmailIgnoreCase(registrationRequest.getEmail())
-                .isPresent()) throw new GenericException(String.format("User with %s already exist in the database", registrationRequest.getEmail()));
-        var user = User.builder()
+                .isPresent()) throw new GenericException(String.format("AppUser with %s already exist in the database", registrationRequest.getEmail()));
+        var user = AppUser.builder()
                 .firstName(registrationRequest.getFirstName())
                 .lastName(registrationRequest.getLastName())
                 .phoneNumber(registrationRequest.getPhoneNumber())
@@ -47,7 +47,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .build();
         userService.sendOTP(tokenRequest);
         return ApiData.builder()
-                .data("User Registration successful")
+                .data("AppUser Registration successful")
                 .build();
     }
 }
