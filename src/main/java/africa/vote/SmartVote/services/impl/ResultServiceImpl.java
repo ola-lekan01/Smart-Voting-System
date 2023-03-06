@@ -8,11 +8,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ResultServiceImpl implements ResultService {
-    @Autowired
-    private ResultRepository resultRepository;
+
+    private final ResultRepository resultRepository;
+
+    public ResultServiceImpl(ResultRepository resultRepository) {
+        this.resultRepository = resultRepository;
+    }
+
     @Override
     public void updateCandidateResult(String resultId) {
-        Result foundResult = resultRepository.findById(resultId).get();
+        Result foundResult = resultRepository.findById(resultId)
+                .orElseThrow(() -> new RuntimeException("Result ID does not exist"));
         foundResult.setNoOfVotes(foundResult
                 .getNoOfVotes() + 1);
         resultRepository.save(foundResult);

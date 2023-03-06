@@ -16,8 +16,11 @@ import java.time.ZonedDateTime;
 @RestController
 @RequestMapping("/api/v1/candidate/")
 public class CandidateController {
+    private final CandidateService candidateService;
     @Autowired
-    private CandidateService candidateService;
+    public CandidateController(CandidateService candidateService) {
+        this.candidateService = candidateService;
+    }
 
     @GetMapping("candidates-result/{pollId}")
     public ResponseEntity<?> candidatesResult(@PathVariable("pollId") String pollId, HttpServletRequest request) {

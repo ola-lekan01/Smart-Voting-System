@@ -34,10 +34,13 @@ public class User implements UserDetails {
     @Column(name = "status", nullable = false, length = 100)
     @Enumerated(EnumType.STRING)
     private Status status;
+    @Column(name = "image_url", nullable = false, length = 255)
+    private String imageURL;
     @Enumerated(EnumType.STRING)
     private Category category;
     @JsonIgnore
     private String password;
+
     @JsonIgnore
     private boolean isEnabled;
 
@@ -77,6 +80,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return true;
     }
 }
