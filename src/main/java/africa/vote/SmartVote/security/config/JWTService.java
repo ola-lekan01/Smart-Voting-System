@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.security.config;
 
+import africa.vote.SmartVote.exeptions.GenericException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -54,7 +55,9 @@ public class JWTService {
     }
 
     private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+        var expirationDate = extractClaim(token, Claims::getExpiration);
+        if(expirationDate.before(new Date())) throw new GenericException("JWT Token Expired");
+        return expirationDate;
     }
 
     private <T> T extractClaim (String token, Function<Claims, T>

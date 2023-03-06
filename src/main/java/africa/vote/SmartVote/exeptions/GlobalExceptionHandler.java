@@ -1,16 +1,12 @@
 package africa.vote.SmartVote.exeptions;
 
 import africa.vote.SmartVote.utils.ApiErrorResponse;
-import io.jsonwebtoken.JwtException;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 
 @RestControllerAdvice
@@ -72,11 +68,11 @@ public class GlobalExceptionHandler {
         ApiErrorResponse errorResponse = ApiErrorResponse.builder()
                 .isSuccessful(false)
                 .data(exception.getMessage())
-                .statusCode(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.FORBIDDEN)
                 .path(httpServletRequest.getRequestURI())
                 .timeStamp(ZonedDateTime.now())
                 .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)

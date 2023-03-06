@@ -9,4 +9,5 @@ import lombok.*;
 @RequiredArgsConstructor
 public class ApiData {
     private String data;
+    private String pollId;
 }

@@ -26,7 +26,6 @@ public class UserController {
     }
 
     @PostMapping("create")
-
     public ResponseEntity<?> createUser(@Valid @RequestBody TokenRequest tokenRequest,
                                         HttpServletRequest request) {
         var data = userService.createAccount(tokenRequest);

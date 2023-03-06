@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.datas.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JsonIgnore
     private String id;
-    @Column(name="no_of_votes", nullable = false, length = 255)
+    @Column(name="no_of_votes", nullable = false)
     private Long noOfVotes;
 }

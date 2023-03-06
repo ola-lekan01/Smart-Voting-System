@@ -3,6 +3,7 @@ package africa.vote.SmartVote.services;
 import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
+import africa.vote.SmartVote.datas.dtos.requests.UpdateUserRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.models.User;
 
@@ -18,5 +19,7 @@ public interface UserService {
     Optional<User> getById(String userId);
     String getUserName();
     ApiData deleteUser();
+    void tokenUpdatedForDeletedUser();
+    ApiData updateAppUser(UpdateUserRequest userRequest);
 }
 

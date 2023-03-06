@@ -1,4 +1,5 @@
 # REGISTRATION ENDPOINT
+
 *For New Users*
 1.  This endpoint allows user to register to the platform.
 2.  This user remains unverified until email verified. 
@@ -6,10 +7,11 @@
 4. This endpoint sends a token which expires in 10 minutes for
    verification to a users valid email address.
 5. A code sample in Node JS using Axios is shown below
+
 ```
-const axios = require('axios');
-let data = JSON.stringify({
-  "firstName": "Lekan", // This field is required
+var axios = require('axios');
+var data = JSON.stringify({
+ "firstName": "Lekan", // This field is required
   "lastName": "Daniel", // This field is optional
   "email": "gab.oyinlola@gmail.com",
   // email field is required with a correct email format
@@ -22,7 +24,7 @@ let data = JSON.stringify({
   "imageURL": "www.cloudinary.com" //This field is required
 });
 
-let config = {
+var config = {
   method: 'post',
 maxBodyLength: Infinity,
   url: 'https://africa-smart.onrender.com/api/v1/registration/register',
@@ -33,15 +35,17 @@ maxBodyLength: Infinity,
 };
 
 axios(config)
-.then((response) => {
+.then(function (response) {
   console.log(JSON.stringify(response.data));
 })
-.catch((error) => {
+.catch(function (error) {
   console.log(error);
 });
+
 ```
 
 # Response from Registration End-Point
+
 *This is a sample of the response from the Registration !!!*
 ```
 {
@@ -64,13 +68,13 @@ axios(config)
 4. The Json web Token would be used to access other end-points
 5. A code sample in Node JS using Axios is shown below
 ```
-const axios = require('axios');
-let data = JSON.stringify({
-  "token": "1268", // This field is required
-  "email": "gab.oyinlola@gmail.com" // This field is required
+var axios = require('axios');
+var data = JSON.stringify({
+  "token": "1073", //This field is required
+  "email": "lekan.sofuyi@outlook.com" //This field is required
 });
 
-let config = {
+var config = {
   method: 'post',
 maxBodyLength: Infinity,
   url: 'https://africa-smart.onrender.com/api/v1/user/create',
@@ -81,12 +85,13 @@ maxBodyLength: Infinity,
 };
 
 axios(config)
-.then((response) => {
+.then(function (response) {
   console.log(JSON.stringify(response.data));
 })
-.catch((error) => {
+.catch(function (error) {
   console.log(error);
 });
+
 ```
 
 # Response from Create User EndPoint
@@ -94,10 +99,10 @@ axios(config)
 
 ```
 {
-    "timestamp": "2023-03-03 || 11:08:17",
+    "timestamp": "2023-03-05 || 23:47:11",
     "status": "OK",
     "data": {
-        "data": <token>
+        "data": "Welcome Lekan, Account Verified Successfully"
     },
     "path": "/api/v1/user/create",
     "successful": true
@@ -492,4 +497,3 @@ axios(config)
     "path": "/api/v1/poll/vote/1",
     "successful": true
 }
-```

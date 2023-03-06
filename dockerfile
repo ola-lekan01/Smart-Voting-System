@@ -13,5 +13,3 @@ COPY src ./src
 EXPOSE ${PORT}
 
 CMD ["./mvnw", "spring-boot:run"]
-
-
