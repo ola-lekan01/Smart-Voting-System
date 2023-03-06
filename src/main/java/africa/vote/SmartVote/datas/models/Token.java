@@ -23,12 +23,12 @@ public class Token {
     private LocalDateTime confirmedTime;
     @OneToOne
     @JoinColumn(name="app_user", referencedColumnName="id")
-    private User user;
+    private AppUser appUser;
 
-    public Token(String token, User user){
+    public Token(String token, AppUser appUser){
         this.token = token;
         this.createdTime = LocalDateTime.now();
         this.expiredTime = LocalDateTime.now().plusMinutes(10);
-        this.user = user;
+        this.appUser = appUser;
     }
 }

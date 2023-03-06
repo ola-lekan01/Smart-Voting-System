@@ -13,13 +13,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 @Entity
-@Table(name = "app_user")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+public class AppUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -34,15 +33,12 @@ public class User implements UserDetails {
     @Column(name = "status", nullable = false, length = 100)
     @Enumerated(EnumType.STRING)
     private Status status;
-    @Column(name = "image_url", nullable = false, length = 255)
+    @Column(name = "image_url", nullable = false)
     private String imageURL;
     @Enumerated(EnumType.STRING)
     private Category category;
     @JsonIgnore
     private String password;
-
-    @JsonIgnore
-    private boolean isEnabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -72,10 +68,6 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
     }
 
     @Override

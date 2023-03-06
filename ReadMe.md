@@ -1,8 +1,8 @@
 # REGISTRATION ENDPOINT
 
 *For New Users*
-1.  This endpoint allows user to register to the platform.
-2.  This user remains unverified until email verified. 
+1.  This endpoint allows appUser to register to the platform.
+2.  This appUser remains unverified until email verified. 
 3. Unverified User will not be allowed access to dashboard
 4. This endpoint sends a token which expires in 10 minutes for
    verification to a users valid email address.
@@ -62,7 +62,7 @@ axios(config)
 # Create User End Point
 *For User Verification*
 
-1.  This endpoint allows user to verify account to the platform. 
+1.  This endpoint allows appUser to verify account to the platform. 
 2. Unverified User will not be allowed access to dashboard
 3. This endpoint responds with a Json Web Token which expires in 3 Hours
 4. The Json web Token would be used to access other end-points
@@ -77,7 +77,7 @@ var data = JSON.stringify({
 var config = {
   method: 'post',
 maxBodyLength: Infinity,
-  url: 'https://africa-smart.onrender.com/api/v1/user/create',
+  url: 'https://africa-smart.onrender.com/api/v1/appUser/create',
   headers: { 
     'Content-Type': 'application/json'
   },
@@ -104,7 +104,7 @@ axios(config)
     "data": {
         "data": "Welcome Lekan, Account Verified Successfully"
     },
-    "path": "/api/v1/user/create",
+    "path": "/api/v1/appUser/create",
     "successful": true
 }
 ```
@@ -113,7 +113,7 @@ axios(config)
 
 *Login Verified Users*
 
-1.  This endpoint allows user to logIn to the platform.
+1.  This endpoint allows appUser to logIn to the platform.
 2. Unverified User will not be allowed to logIn to the dashboard
 3. Unverified User would have to resend Token to a Valid email from the resend token endpoint
 4. This endpoint responds with a Json Web Token which expires in 3 Hours 
@@ -130,7 +130,7 @@ let data = JSON.stringify({
 let config = {
   method: 'post',
 maxBodyLength: Infinity,
-  url: 'https://africa-smart.onrender.com/api/v1/user/login',
+  url: 'https://africa-smart.onrender.com/api/v1/appUser/login',
   headers: { 
     'Content-Type': 'application/json'
   },
@@ -155,7 +155,7 @@ axios(config)
     "data": {
         "data": <token>
     },
-     "path": "/api/v1/user/login",
+     "path": "/api/v1/appUser/login",
     "successful": true
 }
 ```
@@ -175,7 +175,7 @@ let data = JSON.stringify({
 let config = {
   method: 'post',
 maxBodyLength: Infinity,
-  url: 'https://africa-smart.onrender.com/api/v1/user/resend',
+  url: 'https://africa-smart.onrender.com/api/v1/appUser/resend',
   headers: { 
     'Content-Type': 'application/json'
   },
@@ -200,14 +200,14 @@ axios(config)
   "data": {
     "data": "Token sent to email"
   },
-  "path": "/api/v1/user/resend",
+  "path": "/api/v1/appUser/resend",
   "successful": true
 }
 ```
 
 # Verify Token Endpoint
 
-1. This endpoint verifies token provided by the user
+1. This endpoint verifies token provided by the appUser
 
 ```
 const axios = require('axios');
@@ -219,7 +219,7 @@ let data = JSON.stringify({
 let config = {
   method: 'post',
 maxBodyLength: Infinity,
-  url: 'http://localhost:8080/api/v1/user/verify',
+  url: 'http://localhost:8080/api/v1/appUser/verify',
   headers: { 
     'Content-Type': 'application/json'
   },
@@ -245,7 +245,7 @@ axios(config)
     "data": {
         "data": "Token Verified"
     },
-    "path": "/api/v1/user/verify",
+    "path": "/api/v1/appUser/verify",
     "successful": true
 }
 ```
@@ -295,7 +295,7 @@ axios(config)
 *To create a Poll End-point*
 
 1. This endpoint is used to create a poll for other users in the same category
-2. It is only accessed by a verified user with a valid authorization
+2. It is only accessed by a verified appUser with a valid authorization
 ```
 const axios = require('axios');
 let data = JSON.stringify({
@@ -351,7 +351,7 @@ axios(config)
 
 # View Active Poll
 1. This endpoint is used to view the active polls
-2. It is only accessed by a verified user with a valid authorization
+2. It is only accessed by a verified appUser with a valid authorization
 
 ```
 const axios = require('axios');
@@ -423,7 +423,7 @@ axios(config)
 ```
 # View Recent Poll
 1. This endpoint is used to view the Non-active polls
-2. It is only accessed by a verified user with a valid authorization
+2. It is only accessed by a verified appUser with a valid authorization
 ```
 const axios = require('axios');
 
@@ -460,7 +460,7 @@ axios(config)
 
 # Vote Endpoint
 1. This endpoint is used to cast votes
-2. It is only accessed by a verified user with a valid authorization
+2. It is only accessed by a verified appUser with a valid authorization
 ```
 const axios = require('axios');
 let data = JSON.stringify({
