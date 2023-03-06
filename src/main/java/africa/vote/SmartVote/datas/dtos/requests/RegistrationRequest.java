@@ -3,11 +3,13 @@ package africa.vote.SmartVote.datas.dtos.requests;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistrationRequest {
@@ -24,4 +26,6 @@ public class RegistrationRequest {
     private String password;
     @NotBlank(message = "This Field cannot be blank")
     private String category;
+    @NotBlank(message = "This Field cannot be blank")
+    private String imageURL;
 }

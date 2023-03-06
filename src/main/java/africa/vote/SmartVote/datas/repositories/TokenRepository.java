@@ -23,7 +23,6 @@ public interface TokenRepository extends JpaRepository<Token, String> {
     Optional<Token> findByToken(String token);
 
     Optional<Token> findByUserId(String id);
-    void deleteTokenByConfirmedTimeIsBefore(LocalDateTime now);
     @Modifying
     @Query("UPDATE Token token " +
             "SET token.user = NULL " +

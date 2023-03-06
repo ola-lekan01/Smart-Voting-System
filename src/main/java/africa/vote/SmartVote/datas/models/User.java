@@ -5,11 +5,7 @@ import africa.vote.SmartVote.datas.enums.Role;
 import africa.vote.SmartVote.datas.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +14,8 @@ import java.util.Collection;
 import java.util.List;
 @Entity
 @Table(name = "app_user")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,16 +29,18 @@ public class User implements UserDetails {
     private String lastName;
     @Column(name = "phone_number", nullable = false, length = 15)
     private String phoneNumber;
-    @Column(name="email", nullable = false, length = 100)
-    @Email(message = "This field requires a valid email address")
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
     @Column(name = "status", nullable = false, length = 100)
     @Enumerated(EnumType.STRING)
     private Status status;
+    @Column(name = "image_url", nullable = false, length = 255)
+    private String imageURL;
     @Enumerated(EnumType.STRING)
     private Category category;
     @JsonIgnore
     private String password;
+
     @JsonIgnore
     private boolean isEnabled;
 
@@ -81,6 +80,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return true;
     }
 }

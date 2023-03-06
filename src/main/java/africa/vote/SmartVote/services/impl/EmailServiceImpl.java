@@ -25,7 +25,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage mailMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage, "utf-8");
-            mimeMessageHelper.setSubject("Kindly confirm your email address");
+            mimeMessageHelper.setSubject("[Smart Vote] Email Address Confirmation...");
             mimeMessageHelper.setTo(receiverMail);
             mimeMessageHelper.setFrom("adulojujames457@gmail.com");
             mimeMessageHelper.setText(email, true);

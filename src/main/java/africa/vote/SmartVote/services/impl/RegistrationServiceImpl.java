@@ -20,7 +20,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserService userService;
 
     @Autowired
-    public RegistrationServiceImpl(PasswordEncoder passwordEncoder, UserService userService) {
+    public RegistrationServiceImpl(PasswordEncoder passwordEncoder,
+                                   UserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
     }
@@ -36,14 +37,15 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .email(registrationRequest.getEmail().toLowerCase())
                 .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .category(Category.getCategory(registrationRequest.getCategory()))
+                .imageURL(registrationRequest.getImageURL())
                 .status(UNVERIFIED)
                 .build();
         userService.saveUser(user);
+
         ResendTokenRequest tokenRequest = ResendTokenRequest.builder()
                 .email(registrationRequest.getEmail())
                 .build();
         userService.sendOTP(tokenRequest);
-
         return ApiData.builder()
                 .data("User Registration successful")
                 .build();

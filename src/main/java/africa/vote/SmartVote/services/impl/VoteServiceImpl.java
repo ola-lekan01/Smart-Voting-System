@@ -10,15 +10,16 @@ import java.util.List;
 
 @Service
 public class VoteServiceImpl implements VoteService {
-    @Autowired
-    private VoteRepository voteRepository;
+
+    private final VoteRepository voteRepository;
+
+    public VoteServiceImpl(VoteRepository voteRepository) {
+        this.voteRepository = voteRepository;
+    }
+
     @Override
     public void saveUserVote(Vote vote) {
         voteRepository.save(vote);
-    }
-    @Override
-    public Vote findVoteById(String voteId) {
-        return voteRepository.findById(voteId).get();
     }
 
     @Override

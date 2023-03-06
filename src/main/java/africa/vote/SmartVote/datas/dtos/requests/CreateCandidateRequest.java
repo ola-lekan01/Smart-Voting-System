@@ -1,16 +1,16 @@
 package africa.vote.SmartVote.datas.dtos.requests;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-public class ResendTokenRequest {
+@Builder
+public class CreateCandidateRequest {
     @NotBlank(message = "This field Cannot be Blank")
-    @Email(message = "This field requires a valid email address")
-    private String email;
+    private String candidateName;
+    @NotBlank(message = "This field Cannot be Blank")
+    private String candidateImageURL;
 }
