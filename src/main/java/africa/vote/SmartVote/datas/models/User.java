@@ -41,9 +41,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @JsonIgnore
-    private boolean isEnabled;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(Role.USER.name()));
@@ -72,10 +69,6 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
     }
 
     @Override
