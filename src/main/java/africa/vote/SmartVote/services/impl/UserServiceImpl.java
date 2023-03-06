@@ -6,8 +6,8 @@ import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.UpdateUserRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
 import africa.vote.SmartVote.datas.enums.Status;
+import africa.vote.SmartVote.datas.models.AppUser;
 import africa.vote.SmartVote.datas.models.Token;
-import africa.vote.SmartVote.datas.models.User;
 import africa.vote.SmartVote.datas.repositories.TokenRepository;
 import africa.vote.SmartVote.datas.repositories.UserRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
@@ -52,15 +52,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public void saveUser(AppUser appUser) {
+        userRepository.save(appUser);
     }
 
     @Override
     public ApiData createAccount(TokenRequest tokenRequest) {
         tokenVerification(tokenRequest);
         var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
-                .orElseThrow(() -> new GenericException("User Not found"));
+                .orElseThrow(() -> new GenericException("AppUser Not found"));
         userRepository.verifyUser(Status.VERIFIED, tokenRequest.getEmail());
         return ApiData.builder()
                 .data("Welcome, " + foundUser.getFirstName()  + " Account Verified Successfully")
@@ -70,26 +70,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiData sendOTP(ResendTokenRequest tokenRequest) {
         var foundUser = userRepository.findByEmailIgnoreCase(tokenRequest.getEmail())
-                .orElseThrow(() -> new GenericException("User with " + tokenRequest.getEmail() + " not found"));
+                .orElseThrow(() -> new GenericException("AppUser with " + tokenRequest.getEmail() + " not found"));
         return generateToken(tokenRequest, foundUser);
     }
 
 
-    private ApiData generateToken(ResendTokenRequest resendTokenRequest, User savedUser) {
+    private ApiData generateToken(ResendTokenRequest resendTokenRequest, AppUser savedAppUser) {
         final String generateToken = TokenGenerator.generaToken();
-        var token = new Token(generateToken, savedUser);
-        if(tokenRepository.findByUserId(savedUser.getId()).isEmpty()) tokenRepository.save(token);
+        var token = new Token(generateToken, savedAppUser);
+        if(tokenRepository.findByAppUserId(savedAppUser.getId()).isEmpty()) tokenRepository.save(token);
 
         else{
-            var foundUserOTP = tokenRepository.findByUserId(savedUser.getId()).get();
+            var foundUserOTP = tokenRepository.findByAppUserId(savedAppUser.getId()).get();
             foundUserOTP.setToken(generateToken);
             foundUserOTP.setCreatedTime(LocalDateTime.now());
             foundUserOTP.setExpiredTime(LocalDateTime.now().plusMinutes(10));
-            foundUserOTP.setUser(savedUser);
+            foundUserOTP.setAppUser(savedAppUser);
             tokenRepository.save(foundUserOTP);
         }
         emailService.sendEmail(resendTokenRequest.getEmail(),
-                buildEmail(savedUser.getFirstName(), generateToken));
+                buildEmail(savedAppUser.getFirstName(), generateToken));
 
         return ApiData.builder()
                 .data("Token successfully sent to  " + resendTokenRequest.getEmail())
@@ -99,14 +99,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiData tokenVerification(TokenRequest tokenRequest) {
         var foundUser = findByEmailIgnoreCase(tokenRequest.getEmail())
-                .orElseThrow(()-> new GenericException("User Does not Exist"));
+                .orElseThrow(()-> new GenericException("AppUser Does not Exist"));
 
         Token foundToken = tokenRepository.findByToken(tokenRequest.getToken())
                         .orElseThrow(() -> new GenericException("Token doesn't exist"));
 
         if(!Objects.equals(tokenRequest.getToken(), foundToken.getToken())) throw new GenericException("OTP isn't correct");
         if(foundToken.getExpiredTime().isBefore(LocalDateTime.now())) throw new GenericException("OTP already expired");
-        if(!Objects.equals(foundToken.getUser().getId(), foundUser.getId())) throw new GenericException("Invalid Token");
+        if(!Objects.equals(foundToken.getAppUser().getId(), foundUser.getId())) throw new GenericException("Invalid Token");
         tokenRepository.setConfirmedAt(LocalDateTime.now(), foundToken.getId());
         tokenRepository.delete(foundToken);
 
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByEmailIgnoreCase(String email) {
+    public Optional<AppUser> findByEmailIgnoreCase(String email) {
         return userRepository.findByEmailIgnoreCase(email);
     }
 
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
     @Override
-    public Optional<User> getById(String userId) {
+    public Optional<AppUser> getById(String userId) {
         return userRepository.findById(userId);
     }
 
@@ -150,10 +150,10 @@ public class UserServiceImpl implements UserService {
     public ApiData deleteUser() {
         var userEmail = getUserName();
         var foundUser = findByEmailIgnoreCase(userEmail)
-                .orElseThrow(()-> new GenericException("User Not found"));
+                .orElseThrow(()-> new GenericException("AppUser Not found"));
         userRepository.delete(foundUser);
         return ApiData.builder()
-                .data("User Deleted Successfully")
+                .data("AppUser Deleted Successfully")
                 .build();
     }
 
@@ -161,16 +161,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void tokenUpdatedForDeletedUser() {
         String userEmail = getUserName();
-        User userId = tokenRepository.findByUserId(userEmail).get().getUser();
-        System.out.println(userId);
-        tokenRepository.updateTokenForDeletedUnverifiedUsers(userId);
+        AppUser appUserId = tokenRepository.findByAppUserId(userEmail).get().getAppUser();
+        System.out.println(appUserId);
+        tokenRepository.updateTokenForDeletedUnverifiedUsers(appUserId);
     }
 
     @Override
     public ApiData updateAppUser(UpdateUserRequest userRequest) {
         var userEmail = getUserName();
         var foundUser = findByEmailIgnoreCase(userEmail)
-                .orElseThrow(()-> new GenericException("User Not found"));
+                .orElseThrow(()-> new GenericException("AppUser Not found"));
 
         if(userRequest.getFirstName() != null) foundUser.setFirstName(userRequest.getFirstName());
         if(userRequest.getLastName() != null) foundUser.setLastName(userRequest.getLastName());

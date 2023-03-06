@@ -49,7 +49,7 @@ public class PollServiceImpl implements PollService {
 
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
-                .orElseThrow(()-> new GenericException("User Not found"));
+                .orElseThrow(()-> new GenericException("AppUser Not found"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 //       "2023-04-01 08:00:00 24hrs"
         LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest.getStartDateTime(), formatter);
@@ -128,7 +128,7 @@ public class PollServiceImpl implements PollService {
 
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
-                .orElseThrow(()-> new GenericException("User Not found"));
+                .orElseThrow(()-> new GenericException("AppUser Not found"));
 
         var foundPoll = pollRepository.findAll()
                 .stream()
@@ -171,12 +171,12 @@ public class PollServiceImpl implements PollService {
     public ApiData vote(String pollId, VoteRequest voteRequest) {
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
-                .orElseThrow(()-> new GenericException("User Not found"));
+                .orElseThrow(()-> new GenericException("AppUser Not found"));
 
         Poll foundPoll = findPollById(pollId);
 
         for (Vote vote: voteService.findAllVotes()) {
-            boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getUsers().contains(foundUser) && vote.isVoted();
+            boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getAppUsers().contains(foundUser) && vote.isVoted();
             if (votedBefore)throw new GenericException("You can't vote twice");
         }
         List<Candidate> foundPollCandidates = foundPoll.getCandidates();
@@ -187,7 +187,7 @@ public class PollServiceImpl implements PollService {
                 resultService.updateCandidateResult(resultId);
                 Vote vote = new Vote();
                 vote.getPolls().add(foundPoll);
-                vote.getUsers().add(foundUser);
+                vote.getAppUsers().add(foundUser);
                 vote.setVoted(true);
                 voteService.saveUserVote(vote);
             }
