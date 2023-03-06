@@ -22,7 +22,7 @@ public class Vote {
     @Column(name="poll_id", nullable = false)
     private List<Poll> polls = new ArrayList<>();
     @ManyToMany
-    @Column(name="user_id", nullable = false)
+    @Column(name="app_user", nullable = false)
     private List<User> users = new ArrayList<>();
     private boolean voted;
 }
