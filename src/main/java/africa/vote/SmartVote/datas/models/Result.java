@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JsonIgnore
     private String id;
     @Column(name="no_of_votes", nullable = false)
     private Long noOfVotes;

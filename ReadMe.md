@@ -291,59 +291,100 @@ axios(config)
 }
 ```
 
-# Create a Poll
-*To create a Poll End-point*
 
-1. This endpoint is used to create a poll for other users in the same category
-2. It is only accessed by a verified appUser with a valid authorization
+# Updating User Details
+
 ```
-const axios = require('axios');
-let data = JSON.stringify({
-  "title": "Vote for next Cohort Priest",
-  "question": "Whos the Next Cohort Priest",
-  "startDateTime": "2023-03-03 13:33:00",
-  "endDateTime": "2023-04-01 15:00:00",
-  "category": "COHORT_IV",
-  "candidates": [
-    {
-      "name": "Lekan"
-    },
-    {
-      "name": "Yusuf"
-    },
-    {
-      "name": "James"
-    }
-  ]
+var axios = require('axios');
+var data = JSON.stringify({
+  "firstName": "Lekan",
+  "lastName": "Daniel",
+  "phoneNumber": "080345",
+  "password": "23456",
+  "imageURL": "www.newURL.com"
 });
 
-let config = {
-  method: 'post',
+var config = {
+  method: 'put',
 maxBodyLength: Infinity,
-  url: 'https://africa-smart.onrender.com/api/v1/poll/create',
+  url: 'http://localhost:8080/api/v1/welcome/update',
   headers: { 
-    'Authorization': 'Bearer <Json Web Token>', 
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvc2RxcXlxaUBzaGFya2xhc2Vycy5jb20iLCJpYXQiOjE2NzgxMzYxNzAsImV4cCI6MTY3ODE1NDE3MH0.xDNOo-EetYGerZy3GVJCHoUCoWyhRCmZhFuCcRA5fKw', 
     'Content-Type': 'application/json'
   },
   data : data
 };
 
 axios(config)
-.then((response) => {
+.then(function (response) {
   console.log(JSON.stringify(response.data));
 })
-.catch((error) => {
+.catch(function (error) {
   console.log(error);
 });
+
+```
+
+# Create a Poll
+*To create a Poll End-point*
+
+1. This endpoint is used to create a poll for other users in the same category
+2. It is only accessed by a verified appUser with a valid authorization
+```
+var axios = require('axios');
+var data = JSON.stringify({
+  "title": "Class Priest",
+  "question": "Whos the next Class Priest",
+  "startDateTime": "2023-03-06 23:10:00",
+  "endDateTime": "2023-04-01 08:00:00",
+  "category": "COHORT_III",
+  "candidates": [
+    {
+      "candidateName": "Bolaji",
+      "candidateImageURL": "www.bolaji.com"
+    },
+    {
+      "candidateName": "James",
+      "candidateImageURL": "www.james.com"
+    },
+    {
+      "candidateName": "Acha",
+      "candidateImageURL": "www.acha.com"
+    }
+  ]
+});
+
+var config = {
+  method: 'post',
+maxBodyLength: Infinity,
+  url: 'http://localhost:8080/api/v1/poll/create',
+  headers: { 
+    'Authorization': 'Bearer <token>', 
+    'Content-Type': 'application/json'
+  },
+  data : data
+};
+
+axios(config)
+.then(function (response) {
+  console.log(JSON.stringify(response.data));
+})
+.catch(function (error) {
+  console.log(error);
+});
+
 
 ```
 # Create poll response
 *This is a sample of the response from the Create Poll !!!*
 ```
 {
-    "timestamp": "2023-03-03 || 13:30:20",
+    "timestamp": "2023-03-06 || 23:07:42",
     "status": "OK",
-    "data": "Poll Successfully created",
+    "data": {
+        "data": "Poll Successfully Created!!! ",
+        "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
+    },
     "path": "/api/v1/poll/create",
     "successful": true
 }
@@ -352,6 +393,7 @@ axios(config)
 # View Active Poll
 1. This endpoint is used to view the active polls
 2. It is only accessed by a verified appUser with a valid authorization
+3. This is a Get Request
 
 ```
 const axios = require('axios');
@@ -379,40 +421,30 @@ axios(config)
 *This is a sample of the response from the View Active Poll Endpoint !!!*
 ```
 {
-    "timestamp": "2023-03-03 || 13:39:07",
+    "timestamp": "2023-03-06 || 23:54:06",
     "status": "OK",
     "data": [
         {
-            "id": 1,
-            "title": "Vote for next Cohort Priest",
-            "question": "Whos the Next Cohort Priest",
-            "startDateTime": "2023-03-03T13:33:00",
-            "endDateTime": "2023-04-01T15:00:00",
-            "category": "COHORT_IV",
+            "title": "Class Priest",
+            "question": "Whos the next Class Priest",
+            "startDateTime": "2023-03-06T23:10:00",
+            "endDateTime": "2023-04-01T08:00:00",
+            "category": "COHORT_III",
             "candidates": [
                 {
-                    "id": 1,
-                    "name": "Lekan",
-                    "result": {
-                        "id": 1,
-                        "noOfVotes": 0
-                    }
+                    "candidateId": "60e90ae6-4a78-4370-8629-cf9e650c3017",
+                    "candidateName": "Bolaji",
+                    "candidateImageURL": "www.bolaji.com"
                 },
                 {
-                    "id": 2,
-                    "name": "Yusuf",
-                    "result": {
-                        "id": 2,
-                        "noOfVotes": 0
-                    }
+                    "candidateId": "ae9eef4f-3db5-49cb-a9ae-2b6dddac19be",
+                    "candidateName": "James",
+                    "candidateImageURL": "www.james.com"
                 },
                 {
-                    "id": 3,
-                    "name": "James",
-                    "result": {
-                        "id": 3,
-                        "noOfVotes": 0
-                    }
+                    "candidateId": "8317770a-2be2-4a77-b3c8-9ae5fbcad58c",
+                    "candidateName": "Acha",
+                    "candidateImageURL": "www.acha.com"
                 }
             ]
         }
@@ -420,6 +452,7 @@ axios(config)
     "path": "/api/v1/poll/active",
     "successful": true
 }
+
 ```
 # View Recent Poll
 1. This endpoint is used to view the Non-active polls
@@ -450,9 +483,64 @@ axios(config)
 
 ```
 {
-    "timestamp": "2023-03-03 || 13:42:11",
+    "timestamp": "2023-03-07 || 00:39:13",
     "status": "OK",
-    "data": [],
+    "data": [
+        {
+            "title": "Food Priest",
+            "question": "Whos the next Food Priest",
+            "startDateTime": "2023-03-06T23:20:00",
+            "endDateTime": "2023-03-06T23:50:00",
+            "category": "COHORT_II",
+            "candidates": [
+                {
+                    "candidateName": "Bolaji",
+                    "candidateImageURL": "www.bolaji.com",
+                    "candidateResult": 0,
+                    "pollId": "a02876e6-52f2-4d1b-8f87-acf7de3c70ee"
+                },
+                {
+                    "candidateName": "James",
+                    "candidateImageURL": "www.james.com",
+                    "candidateResult": 0,
+                    "pollId": "a02876e6-52f2-4d1b-8f87-acf7de3c70ee"
+                },
+                {
+                    "candidateName": "Acha",
+                    "candidateImageURL": "www.acha.com",
+                    "candidateResult": 0,
+                    "pollId": "a02876e6-52f2-4d1b-8f87-acf7de3c70ee"
+                }
+            ]
+        }
+        {
+            "title": "Priestest",
+            "question": "Whos the next Priestiest",
+            "startDateTime": "2023-03-06T23:20:00",
+            "endDateTime": "2023-03-06T23:50:00",
+            "category": "COHORT_I",
+            "candidates": [
+                {
+                    "candidateName": "hadiza",
+                    "candidateImageURL": "www.bolaji.com",
+                    "candidateResult": 0,
+                    "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
+                },
+                {
+                    "candidateName": "Jenifer",
+                    "candidateImageURL": "www.james.com",
+                    "candidateResult": 0,
+                    "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
+                },
+                {
+                    "candidateName": "Kelz",
+                    "candidateImageURL": "www.acha.com",
+                    "candidateResult": 0,
+                    "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
+                }
+            ]
+        }
+    ],
     "path": "/api/v1/poll/recent",
     "successful": true
 }

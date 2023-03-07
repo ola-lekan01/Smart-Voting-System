@@ -17,6 +17,5 @@ public class CreatePollRequest {
     private String endDateTime;
     @NotBlank(message = "This field Cannot be Blank")
     private String category;
-    @NotBlank(message = "This field Cannot be Blank")
     private List<CreateCandidateRequest> candidates;
 }

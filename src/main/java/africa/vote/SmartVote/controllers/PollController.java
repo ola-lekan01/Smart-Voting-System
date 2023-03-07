@@ -82,4 +82,20 @@ public class PollController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
+    @DeleteMapping("vote/{poll_id}")
+    public ResponseEntity<?> delete(@PathVariable("poll_id") String pollId,
+                                  HttpServletRequest request) {
+
+        var data = pollService.deletePoll(pollId);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .data(data)
+                .timestamp(ZonedDateTime.now())
+                .path(request.getRequestURI())
+                .isSuccessful(true)
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
 }
