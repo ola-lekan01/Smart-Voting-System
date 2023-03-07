@@ -202,6 +202,11 @@ public class PollServiceImpl implements PollService {
 
         Poll foundPoll = findPollById(pollId);
 
+        if (!foundPoll.getCandidates().contains(candidateService.findById(
+                voteRequest.getCandidateId()
+        ))) throw new GenericException("Candidate doesnt belong to this poll");
+
+
         // TODO: 3/7/2023 Associate Yusuf kabir
         //  validations to ensure voting has commenced I dont know why it isn't working with the below code, please review
 
@@ -222,6 +227,7 @@ public class PollServiceImpl implements PollService {
             if (votedBefore)throw new GenericException("You can't vote twice");
         }
         List<Candidate> foundPollCandidates = foundPoll.getCandidates();
+
 
         for (Candidate candidate: foundPollCandidates) {
             if (candidate.getId().equals(voteRequest.getCandidateId())){

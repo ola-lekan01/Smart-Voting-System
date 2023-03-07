@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 
@@ -57,5 +58,10 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public Candidate save(Candidate candidate) {
         return candidateRepository.save(candidate);
+    }
+
+    @Override
+    public Candidate findById(String candidateId) {
+        return candidateRepository.findById(candidateId).orElseThrow(()->new GenericException("Candidate not found"));
     }
 }
