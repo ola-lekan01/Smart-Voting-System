@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class ResultServiceImpl implements ResultService {
 
     private final ResultRepository resultRepository;
-
+    @Autowired
     public ResultServiceImpl(ResultRepository resultRepository) {
         this.resultRepository = resultRepository;
     }

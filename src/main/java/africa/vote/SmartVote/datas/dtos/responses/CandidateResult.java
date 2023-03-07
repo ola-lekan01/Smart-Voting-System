@@ -1,6 +1,7 @@
 package africa.vote.SmartVote.datas.dtos.responses;
 
 
+import africa.vote.SmartVote.datas.enums.Status;
 import lombok.*;
 
 @Getter

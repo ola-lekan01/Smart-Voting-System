@@ -29,7 +29,7 @@ public class Poll {
     private LocalDateTime endDateTime;
     @JsonIgnore
     @JoinColumn(name = "app_user", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne()
     private AppUser users;
     @Enumerated(EnumType.STRING)
     private Category category;

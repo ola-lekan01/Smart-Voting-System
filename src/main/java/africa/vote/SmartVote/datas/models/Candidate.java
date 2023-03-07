@@ -16,8 +16,6 @@ public class Candidate {
     private String id;
     @Column(name="name", nullable = false)
     private String name;
-    @Column(name="image_url", nullable = false)
-    private String imageURL;
     @OneToOne
     @JoinColumn(name = "result", referencedColumnName = "id")
     private Result result;

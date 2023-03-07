@@ -20,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static africa.vote.SmartVote.datas.enums.Status.*;
+
 
 @Service
 public class PollServiceImpl implements PollService {
@@ -55,15 +57,13 @@ public class PollServiceImpl implements PollService {
         LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest.getEndDateTime(), formatter);
 
         //Building Candidates from Poll Request
-        for (int i = 0; i < createPollRequest.getCandidates().size() - 1; i++) {
+        for (int i = 0; i <= createPollRequest.getCandidates().size() - 1; i++) {
 
             Candidate candidate = new Candidate();
             Result result = new Result();
             result.setNoOfVotes(0L);
             var savedResult = resultService.saveResult(result);
-
             candidate.setName(createPollRequest.getCandidates().get(i).getCandidateName());
-            candidate.setImageURL(createPollRequest.getCandidates().get(i).getCandidateImageURL());
             candidate.setResult(savedResult);
 
             var savedCandidate = candidateService.save(candidate);
@@ -97,11 +97,17 @@ public class PollServiceImpl implements PollService {
         List<RecentPoll> recentPolls = new ArrayList<>();
         List<CandidateResult> candidateResults;
 
+        var userEmail = userService.getUserName();
+        var foundUser = userService.findByEmailIgnoreCase(userEmail)
+                .orElseThrow(()-> new GenericException("AppUser Not found"));
+
         var foundPolls =  pollRepository.findAll()
                 .stream()
                 .filter(poll -> poll
                         .getEndDateTime()
-                        .isBefore(LocalDateTime.now()))
+                        .isBefore(LocalDateTime.now())
+//                        && poll.getCategory().equals(foundUser.getCategory())
+                )
                 .toList();
 
         for (Poll poll : foundPolls) {
@@ -112,12 +118,12 @@ public class PollServiceImpl implements PollService {
             recentPollList.setStartDateTime(poll.getStartDateTime());
             recentPollList.setEndDateTime(poll.getEndDateTime());
             recentPollList.setCategory(poll.getCategory());
+            recentPollList.setStatus(CLOSED);
 
             Poll foundCandidatePoll = pollRepository.findById(poll.getId())
                     .orElseThrow(() -> new GenericException("Invalid Polls"));
             for (Candidate candidate : foundCandidatePoll.getCandidates()) {
                 CandidateResult candidateResult = CandidateResult.builder()
-                        .candidateImageURL(candidate.getImageURL())
                         .candidateName(candidate.getName())
                         .candidateResult(candidate.getResult().getNoOfVotes())
                         .pollId(foundCandidatePoll.getId())
@@ -133,6 +139,12 @@ public class PollServiceImpl implements PollService {
 
     @Override
     public List<ActivePoll> activePolls() {
+        // TODO: 3/7/2023 As per your implementation to create a poll, a user can create poll for other cohort,
+        //  but your implementation for finding all active poll, its limiting the search to only his cohorts
+        //  Would a user from another cohort be able to participate for a poll outside his cohort,
+        //  Since when the poll is created your implementations allows for them to input the cohort the poll
+        //  is meant for I commented out the part where you are getting poll by Cohort
+
         List<ActivePoll> activePollList = new ArrayList<>();
         List<CandidateResponse> candidateList;
 
@@ -155,7 +167,6 @@ public class PollServiceImpl implements PollService {
                         .isAfter(LocalDateTime.now()))
                 .toList();
 
-
         for (Poll poll : foundPolls) {
             candidateList = new ArrayList<>();
             ActivePoll activePoll = new ActivePoll();
@@ -165,13 +176,13 @@ public class PollServiceImpl implements PollService {
             activePoll.setEndDateTime(poll.getEndDateTime());
             activePoll.setCategory(poll.getCategory());
             activePoll.setPollId(poll.getId());
+            activePoll.setStatus(ACTIVE);
 
             Poll foundCandidatePoll = pollRepository.findById(poll.getId())
                     .orElseThrow(() -> new GenericException("Invalid Polls"));
             for (Candidate candidate : foundCandidatePoll.getCandidates()) {
                 CandidateResponse candidateResponse = CandidateResponse.builder()
                         .candidateName(candidate.getName())
-                        .candidateImageURL(candidate.getImageURL())
                         .candidateId(candidate.getId())
                         .build();
                 candidateList.add(candidateResponse);
@@ -191,15 +202,20 @@ public class PollServiceImpl implements PollService {
 
         Poll foundPoll = findPollById(pollId);
 
-        // TODO: 3/7/2023 Associate Yusuf kabir 
-        // TODO: 3/7/2023 validations to ensure voting has commenced 
+        // TODO: 3/7/2023 Associate Yusuf kabir
+        //  validations to ensure voting has commenced I dont know why it isn't working with the below code, please review
+
 
 //        if(foundPoll.getStartDateTime().isBefore(LocalDateTime.now())) throw new GenericException("Voting for the Category is not Started Yet...");
 //        if(foundPoll.getEndDateTime().isAfter(LocalDateTime.now())) throw new GenericException("Voting for the Category has ended ...");
 
-        // TODO: 3/7/2023 When casting a vote, I'm to submit more than one vote from a pollId and candidateId not from the same polls 
+        // TODO: 3/7/2023 When casting a vote, I'm can submit more than one vote from a pollId and candidateId not from the same polls
         // TODO: 3/7/2023 validations to check that the candidateId and pollId are in the same poll before poll submissions
-        // TODO: 3/7/2023 The results still seems intacts but I just think we should make validations 
+        // TODO: 3/7/2023 The results still seems intacts but I just think we should make validations
+        //  {
+        //  "pollId": "a2ca0345-3a8f-4a91-874a-623a7a57a4d9", This is a poll Id from a different Poll
+        //  "candidateId": "b201f920-ce4b-4670-9f81-c8c93287a02f" This is a candidateId from a different Poll
+        //  }
 
         for (Vote vote: voteService.findAllVotes()) {
             boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getAppUsers().contains(foundUser) && vote.isVoted();
