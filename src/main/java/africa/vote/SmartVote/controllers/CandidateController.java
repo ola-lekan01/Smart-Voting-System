@@ -22,7 +22,7 @@ public class CandidateController {
         this.candidateService = candidateService;
     }
 
-    @GetMapping("candidates-result/{pollId}")
+    @GetMapping("results/{pollId}")
     public ResponseEntity<?> candidatesResult(@PathVariable("pollId") String pollId, HttpServletRequest request) {
         var data = candidateService.findAllCandidatesResultOfAPoll(pollId);
         ApiResponse apiResponse = ApiResponse.builder()

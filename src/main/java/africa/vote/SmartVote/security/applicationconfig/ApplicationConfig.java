@@ -1,6 +1,7 @@
 package africa.vote.SmartVote.security.applicationconfig;
 
 import africa.vote.SmartVote.datas.repositories.UserRepository;
+import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.exeptions.UsernameNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -35,8 +36,11 @@ public class ApplicationConfig {
     }
     @Bean
     public AuthenticationManager authenticationManager
-            (AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+            (AuthenticationConfiguration authConfig) {
+        try {return authConfig.getAuthenticationManager();
+        } catch (Exception exception) {
+            throw new GenericException(exception.getMessage());
+        }
     }
     @Bean
     public PasswordEncoder passwordEncoder(){ return new BCryptPasswordEncoder();}
