@@ -132,8 +132,10 @@ public class UserServiceImpl implements UserService {
 
         var foundUser = findByEmailIgnoreCase(request.getEmail())
                 .orElseThrow(()-> new GenericException("Uer does not Exist"));
+
         return ApiData.builder()
                 .data(jwtService.generateToken(foundUser))
+                .imageURL(foundUser.getImageURL())
                 .build();
     }
     @Override

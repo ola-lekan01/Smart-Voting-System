@@ -8,7 +8,6 @@ import africa.vote.SmartVote.datas.models.Candidate;
 import africa.vote.SmartVote.datas.models.Poll;
 import africa.vote.SmartVote.datas.models.Result;
 import africa.vote.SmartVote.datas.models.Vote;
-import africa.vote.SmartVote.datas.repositories.CandidateRepository;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.*;
@@ -21,57 +20,59 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
     private final UserService userService;
     private final ResultService resultService;
     private final VoteService voteService;
-    private final CandidateRepository candidateRepository;
+    private final CandidateService candidateService;
 
     @Autowired
     public PollServiceImpl(PollRepository pollRepository,
                            UserService userService,
                            ResultService resultService,
                            VoteService voteService,
-                           CandidateRepository candidateRepository) {
+                           CandidateService candidateService) {
         this.pollRepository = pollRepository;
         this.userService = userService;
         this.resultService = resultService;
         this.voteService = voteService;
-        this.candidateRepository = candidateRepository;
+        this.candidateService = candidateService;
     }
 
     @Override
-    public ApiData createPoll(CreatePollRequest createPollRequest) {
-        var candidate = new Candidate();
+    public CreatePollAPIData createPoll(CreatePollRequest createPollRequest) {
         List<Candidate> candidateLists = new ArrayList<>();
-
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 //       "2023-04-01 08:00:00 24hrs"
         LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest.getStartDateTime(), formatter);
         LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest.getEndDateTime(), formatter);
 
         //Building Candidates from Poll Request
-        for (int i = 0; i < createPollRequest.getCandidates().size(); i++) {
+        for (int i = 0; i < createPollRequest.getCandidates().size() - 1; i++) {
+
+            Candidate candidate = new Candidate();
+            Result result = new Result();
+            result.setNoOfVotes(0L);
+            var savedResult = resultService.saveResult(result);
+
             candidate.setName(createPollRequest.getCandidates().get(i).getCandidateName());
             candidate.setImageURL(createPollRequest.getCandidates().get(i).getCandidateImageURL());
-            candidateRepository.save(candidate);
-            candidateLists.add(candidate);
+            candidate.setResult(savedResult);
+
+            var savedCandidate = candidateService.save(candidate);
+            candidateLists.add(savedCandidate);
         }
 
         if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
         if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
         if (endDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll End date/time cant be before current date/time");
-
-        for (Candidate candidates: candidateLists) {
-            Result result = new Result();
-            result.setNoOfVotes(0L);
-            candidates.setResult(result);
-        }
 
         Poll poll = Poll.builder()
                 .title(createPollRequest.getTitle())
@@ -82,9 +83,10 @@ public class PollServiceImpl implements PollService {
                 .category(Category.getCategory(createPollRequest.getCategory()))
                 .users(foundUser)
                 .build();
+
         var savedPoll = pollRepository.save(poll);
 
-        return ApiData.builder()
+        return CreatePollAPIData.builder()
                 .data("Poll Successfully Created!!! ")
                 .pollId(savedPoll.getId())
                 .build();
@@ -93,7 +95,8 @@ public class PollServiceImpl implements PollService {
     @Override
     public List<RecentPoll> recentPolls() {
         List<RecentPoll> recentPolls = new ArrayList<>();
-        List<CandidateResult> candidateResult = new ArrayList<>();
+        List<CandidateResult> candidateResults;
+
         var foundPolls =  pollRepository.findAll()
                 .stream()
                 .filter(poll -> poll
@@ -101,36 +104,43 @@ public class PollServiceImpl implements PollService {
                         .isBefore(LocalDateTime.now()))
                 .toList();
 
-        for (int i = 0; i < foundPolls.size(); i++) {
-            CandidateResult.builder()
-                    .candidateImageURL(foundPolls.get(i).getCandidates().get(i).getImageURL())
-                    .candidateName(foundPolls.get(i).getCandidates().get(i).getName())
-                    .candidateResult(foundPolls.get(i).getCandidates().get(i).getResult().getNoOfVotes())
-                    .build();
-        }
+        for (Poll poll : foundPolls) {
+            candidateResults = new ArrayList<>();
+            RecentPoll recentPollList = new RecentPoll();
+            recentPollList.setTitle(poll.getTitle());
+            recentPollList.setQuestion(poll.getQuestion());
+            recentPollList.setStartDateTime(poll.getStartDateTime());
+            recentPollList.setEndDateTime(poll.getEndDateTime());
+            recentPollList.setCategory(poll.getCategory());
 
-        for (Poll foundPoll : foundPolls) {
-            RecentPoll.builder()
-                    .title(foundPoll.getTitle())
-                    .question(foundPoll.getQuestion())
-                    .startDateTime(foundPoll.getStartDateTime())
-                    .endDateTime(foundPoll.getEndDateTime())
-                    .category(foundPoll.getCategory())
-                    .candidates(candidateResult)
-                    .build();
+            Poll foundCandidatePoll = pollRepository.findById(poll.getId())
+                    .orElseThrow(() -> new GenericException("Invalid Polls"));
+            for (Candidate candidate : foundCandidatePoll.getCandidates()) {
+                CandidateResult candidateResult = CandidateResult.builder()
+                        .candidateImageURL(candidate.getImageURL())
+                        .candidateName(candidate.getName())
+                        .candidateResult(candidate.getResult().getNoOfVotes())
+                        .pollId(foundCandidatePoll.getId())
+                        .build();
+                candidateResults.add(candidateResult);
+            }
+            recentPollList.setCandidates(candidateResults);
+            recentPolls.add(recentPollList);
         }
         return recentPolls;
     }
+
+
     @Override
     public List<ActivePoll> activePolls() {
-        List<ActivePoll> pollList = new ArrayList<>();
-        List<CandidateResponse> candidateList = new ArrayList<>();
+        List<ActivePoll> activePollList = new ArrayList<>();
+        List<CandidateResponse> candidateList;
 
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
 
-        var foundPoll = pollRepository.findAll()
+        var foundPolls = pollRepository.findAll()
                 .stream()
                 .filter(poll -> (poll
                         .getStartDateTime()
@@ -138,42 +148,58 @@ public class PollServiceImpl implements PollService {
                 || poll
                         .getStartDateTime()
                         .isBefore(LocalDateTime.now()))
-                && poll.getCategory()
-                        .equals(foundUser.getCategory())
+//                && poll.getCategory()
+//                        .equals(foundUser.getCategory())
                 && poll.
                         getEndDateTime()
                         .isAfter(LocalDateTime.now()))
                 .toList();
 
-        for (int i = 0; i < foundPoll.size(); i++) {
-            CandidateResponse.builder()
-                    .candidateName(foundPoll.get(i).getCandidates().get(i).getName())
-                    .candidateImageURL(foundPoll.get(i).getCandidates().get(i).getImageURL())
-                    .candidateId(foundPoll.get(i).getCandidates().get(i).getId())
-                    .build();
-        }
 
-        for (Poll value : foundPoll) {
-            ActivePoll.builder()
-                    .title(value.getTitle())
-                    .question(value.getQuestion())
-                    .startDateTime(value.getStartDateTime())
-                    .endDateTime(value.getEndDateTime())
-                    .category(value.getCategory())
-                    .candidates(candidateList)
-                    .build();
+        for (Poll poll : foundPolls) {
+            candidateList = new ArrayList<>();
+            ActivePoll activePoll = new ActivePoll();
+            activePoll.setTitle(poll.getTitle());
+            activePoll.setQuestion(poll.getQuestion());
+            activePoll.setStartDateTime(poll.getStartDateTime());
+            activePoll.setEndDateTime(poll.getEndDateTime());
+            activePoll.setCategory(poll.getCategory());
+            activePoll.setPollId(poll.getId());
+
+            Poll foundCandidatePoll = pollRepository.findById(poll.getId())
+                    .orElseThrow(() -> new GenericException("Invalid Polls"));
+            for (Candidate candidate : foundCandidatePoll.getCandidates()) {
+                CandidateResponse candidateResponse = CandidateResponse.builder()
+                        .candidateName(candidate.getName())
+                        .candidateImageURL(candidate.getImageURL())
+                        .candidateId(candidate.getId())
+                        .build();
+                candidateList.add(candidateResponse);
+            }
+            activePoll.setCandidates(candidateList);
+            activePollList.add(activePoll);
         }
-        return pollList;
+        return activePollList;
     }
 
     @Transactional
     @Override
-    public ApiData vote(String pollId, VoteRequest voteRequest) {
+    public CreatePollAPIData vote(String pollId, VoteRequest voteRequest) {
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
 
         Poll foundPoll = findPollById(pollId);
+
+        // TODO: 3/7/2023 Associate Yusuf kabir 
+        // TODO: 3/7/2023 validations to ensure voting has commenced 
+
+//        if(foundPoll.getStartDateTime().isBefore(LocalDateTime.now())) throw new GenericException("Voting for the Category is not Started Yet...");
+//        if(foundPoll.getEndDateTime().isAfter(LocalDateTime.now())) throw new GenericException("Voting for the Category has ended ...");
+
+        // TODO: 3/7/2023 When casting a vote, I'm to submit more than one vote from a pollId and candidateId not from the same polls 
+        // TODO: 3/7/2023 validations to check that the candidateId and pollId are in the same poll before poll submissions
+        // TODO: 3/7/2023 The results still seems intacts but I just think we should make validations 
 
         for (Vote vote: voteService.findAllVotes()) {
             boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getAppUsers().contains(foundUser) && vote.isVoted();
@@ -192,8 +218,9 @@ public class PollServiceImpl implements PollService {
                 voteService.saveUserVote(vote);
             }
         }
-        return ApiData.builder()
+        return CreatePollAPIData.builder()
                 .data("You have successfully casted your vote!!! ")
+                .pollId(foundPoll.getId())
                 .build();
     }
 
@@ -201,5 +228,14 @@ public class PollServiceImpl implements PollService {
     public Poll findPollById(String pollId) {
         return pollRepository.findById(pollId)
                 .orElseThrow(()-> new GenericException("Poll Id Does not Exist! "));
+    }
+
+    @Override
+    public ApiData deletePoll(String pollId) {
+        var foundPoll = findPollById(pollId);
+        pollRepository.delete(foundPoll);
+        return ApiData.builder()
+                .data("Poll ID Deleted Successfully")
+                .build();
     }
 }

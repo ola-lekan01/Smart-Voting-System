@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class ApiData {
+public class CreatePollAPIData {
     private String data;
-    private String imageURL;
+    private String pollId;
 }
