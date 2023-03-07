@@ -5,6 +5,7 @@ import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.UpdateUserRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
+import africa.vote.SmartVote.datas.dtos.responses.LoginData;
 import africa.vote.SmartVote.datas.models.AppUser;
 
 import java.util.Optional;
@@ -15,7 +16,7 @@ public interface UserService {
     ApiData tokenVerification(TokenRequest tokenRequest);
     Optional<AppUser> findByEmailIgnoreCase(String email);
     ApiData sendOTP(ResendTokenRequest tokenRequest);
-    ApiData authenticate(LoginRequest request);
+    LoginData authenticate(LoginRequest request);
     Optional<AppUser> getById(String userId);
     String getUserName();
     ApiData deleteUser();

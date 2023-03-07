@@ -8,7 +8,9 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class ApiData {
-    private String data;
-    private String message;
+public class LoginData {
+    private String token;
+    private String imageURL;
+    private String firstName;
+    private Category category;
 }
