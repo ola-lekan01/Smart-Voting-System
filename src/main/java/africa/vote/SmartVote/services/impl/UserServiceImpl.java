@@ -5,6 +5,7 @@ import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.UpdateUserRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiData;
+import africa.vote.SmartVote.datas.dtos.responses.LoginData;
 import africa.vote.SmartVote.datas.enums.Status;
 import africa.vote.SmartVote.datas.models.AppUser;
 import africa.vote.SmartVote.datas.models.Token;
@@ -122,7 +123,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ApiData authenticate(LoginRequest request) {
+    public LoginData authenticate(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -133,9 +134,11 @@ public class UserServiceImpl implements UserService {
         var foundUser = findByEmailIgnoreCase(request.getEmail())
                 .orElseThrow(()-> new GenericException("Uer does not Exist"));
 
-        return ApiData.builder()
-                .data(jwtService.generateToken(foundUser))
+        return LoginData.builder()
+                .token(jwtService.generateToken(foundUser))
                 .imageURL(foundUser.getImageURL())
+                .firstName(foundUser.getFirstName())
+                .category(foundUser.getCategory())
                 .build();
     }
     @Override
