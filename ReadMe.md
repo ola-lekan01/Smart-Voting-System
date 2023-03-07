@@ -219,7 +219,7 @@ let data = JSON.stringify({
 let config = {
   method: 'post',
 maxBodyLength: Infinity,
-  url: 'http://localhost:8080/api/v1/appUser/verify',
+  url: 'https://africa-smart.onrender.com/api/v1/appUser/verify',
   headers: { 
     'Content-Type': 'application/json'
   },
@@ -307,9 +307,9 @@ var data = JSON.stringify({
 var config = {
   method: 'put',
 maxBodyLength: Infinity,
-  url: 'http://localhost:8080/api/v1/welcome/update',
+  url: 'https://africa-smart.onrender.com/api/v1/welcome/update',
   headers: { 
-    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvc2RxcXlxaUBzaGFya2xhc2Vycy5jb20iLCJpYXQiOjE2NzgxMzYxNzAsImV4cCI6MTY3ODE1NDE3MH0.xDNOo-EetYGerZy3GVJCHoUCoWyhRCmZhFuCcRA5fKw', 
+    'Authorization': 'Bearer <JSON token>', 
     'Content-Type': 'application/json'
   },
   data : data
@@ -333,23 +333,20 @@ axios(config)
 ```
 var axios = require('axios');
 var data = JSON.stringify({
-  "title": "Class Priest",
-  "question": "Whos the next Class Priest",
-  "startDateTime": "2023-03-06 23:10:00",
-  "endDateTime": "2023-04-01 08:00:00",
-  "category": "COHORT_III",
+  "title": "Priest",
+  "question": "Whos the next Priest",
+  "startDateTime": "2023-03-07 09:10:00",
+  "endDateTime": "2023-03-07 09:30:00",
+  "category": "COHORT_IV",
   "candidates": [
     {
-      "candidateName": "Bolaji",
-      "candidateImageURL": "www.bolaji.com"
+      "candidateName": "Name 10"
     },
     {
-      "candidateName": "James",
-      "candidateImageURL": "www.james.com"
+      "candidateName": "Name 11"
     },
     {
-      "candidateName": "Acha",
-      "candidateImageURL": "www.acha.com"
+      "candidateName": "Name 12"
     }
   ]
 });
@@ -357,9 +354,9 @@ var data = JSON.stringify({
 var config = {
   method: 'post',
 maxBodyLength: Infinity,
-  url: 'http://localhost:8080/api/v1/poll/create',
+  url: 'https://africa-smart.onrender.com/api/v1/poll/create',
   headers: { 
-    'Authorization': 'Bearer <token>', 
+    'Authorization': 'Bearer <>JSON token', 
     'Content-Type': 'application/json'
   },
   data : data
@@ -388,6 +385,30 @@ axios(config)
     "path": "/api/v1/poll/create",
     "successful": true
 }
+```
+
+# Deleting a Poll
+
+```
+var axios = require('axios');
+
+var config = {
+  method: 'delete',
+maxBodyLength: Infinity,
+  url: 'https://africa-smart.onrender.com/api/v1/poll/vote/{pollId}',
+  headers: { 
+    'Authorization': 'Bearer <JSON token>'
+  }
+};
+
+axios(config)
+.then(function (response) {
+  console.log(JSON.stringify(response.data));
+})
+.catch(function (error) {
+  console.log(error);
+});
+
 ```
 
 # View Active Poll
@@ -434,17 +455,20 @@ axios(config)
                 {
                     "candidateId": "60e90ae6-4a78-4370-8629-cf9e650c3017",
                     "candidateName": "Bolaji",
-                    "candidateImageURL": "www.bolaji.com"
+                    "candidateImageURL": "www.bolaji.com",
+                    "status": "ACTIVE"
                 },
                 {
                     "candidateId": "ae9eef4f-3db5-49cb-a9ae-2b6dddac19be",
                     "candidateName": "James",
-                    "candidateImageURL": "www.james.com"
+                    "candidateImageURL": "www.james.com",
+                    "status": "ACTIVE"
                 },
                 {
                     "candidateId": "8317770a-2be2-4a77-b3c8-9ae5fbcad58c",
                     "candidateName": "Acha",
-                    "candidateImageURL": "www.acha.com"
+                    "candidateImageURL": "www.acha.com",
+                    "status": "INACTIVE"
                 }
             ]
         }
@@ -497,18 +521,21 @@ axios(config)
                     "candidateName": "Bolaji",
                     "candidateImageURL": "www.bolaji.com",
                     "candidateResult": 0,
+                    "status": "INACTIVE",
                     "pollId": "a02876e6-52f2-4d1b-8f87-acf7de3c70ee"
                 },
                 {
                     "candidateName": "James",
                     "candidateImageURL": "www.james.com",
                     "candidateResult": 0,
+                    "status": "INACTIVE",
                     "pollId": "a02876e6-52f2-4d1b-8f87-acf7de3c70ee"
                 },
                 {
                     "candidateName": "Acha",
                     "candidateImageURL": "www.acha.com",
                     "candidateResult": 0,
+                    "status": "INACTIVE",
                     "pollId": "a02876e6-52f2-4d1b-8f87-acf7de3c70ee"
                 }
             ]
@@ -524,18 +551,21 @@ axios(config)
                     "candidateName": "hadiza",
                     "candidateImageURL": "www.bolaji.com",
                     "candidateResult": 0,
+                    "status": "INACTIVE",
                     "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
                 },
                 {
                     "candidateName": "Jenifer",
                     "candidateImageURL": "www.james.com",
                     "candidateResult": 0,
+                    "status": "INACTIVE",
                     "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
                 },
                 {
                     "candidateName": "Kelz",
                     "candidateImageURL": "www.acha.com",
                     "candidateResult": 0,
+                    "status": "INACTIVE",
                     "pollId": "ee569d50-e731-4f64-8c8f-64b68224336b"
                 }
             ]
@@ -558,7 +588,7 @@ let data = JSON.stringify({
 let config = {
   method: 'put',
 maxBodyLength: Infinity,
-  url: 'https://africa-smart.onrender.com/api/v1/poll/vote/1',
+  url: 'https://africa-smart.onrender.com/api/v1/poll/vote/{pollId}',
   headers: { 
     'Authorization': 'Bearer <Json Web Token>', 
     'Content-Type': 'application/json'
@@ -585,3 +615,63 @@ axios(config)
     "path": "/api/v1/poll/vote/1",
     "successful": true
 }
+```
+# Viewing results from poll
+*This is a sample of the response from the Viewing Result !!!*
+
+```
+var axios = require('axios');
+var data = '';
+
+var config = {
+  method: 'get',
+maxBodyLength: Infinity,
+  url: 'https://africa-smart.onrender.com/api/v1/candidate/results/{pollId}',
+  headers: { 
+    'Authorization': 'Bearer <JSON token>'
+  },
+  data : data
+};
+
+axios(config)
+.then(function (response) {
+  console.log(JSON.stringify(response.data));
+})
+.catch(function (error) {
+  console.log(error);
+});
+
+```
+# Viewing results from poll Response Body
+*This is a sample of the response from the Result Endpoint !!!*
+```
+{
+    "timestamp": "2023-03-07 || 08:07:35",
+    "status": "OK",
+    "data": [
+        {
+            "candidateName": "Bolaji",
+            "candidateImageURL": "www.bolaji.com",
+            "candidateResult": 0,
+            "pollId": "38f4c2fb-a701-456a-a67f-0b257400d676",
+            "status": "INACTIVE"
+        },
+        {
+            "candidateName": "James",
+            "candidateImageURL": "www.james.com",
+            "candidateResult": 1,
+            "pollId": "38f4c2fb-a701-456a-a67f-0b257400d676",
+            "status": "INACTIVE"
+        },
+        {
+            "candidateName": "Acha",
+            "candidateImageURL": "www.acha.com",
+            "candidateResult": 0,
+            "pollId": "38f4c2fb-a701-456a-a67f-0b257400d676",
+            "status": "INACTIVE"
+        }
+    ],
+    "path": "/api/v1/candidate/results/38f4c2fb-a701-456a-a67f-0b257400d676",
+    "successful": true
+}
+```

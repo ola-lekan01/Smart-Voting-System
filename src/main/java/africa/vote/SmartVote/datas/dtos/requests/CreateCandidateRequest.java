@@ -11,6 +11,4 @@ import lombok.*;
 public class CreateCandidateRequest {
     @NotBlank(message = "This field Cannot be Blank")
     private String candidateName;
-    @NotBlank(message = "This field Cannot be Blank")
-    private String candidateImageURL;
 }
