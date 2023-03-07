@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CandidateService {
     List<CandidateResult> findAllCandidatesResultOfAPoll(String pollId);
-    void save(Candidate candidate);
+    Candidate save(Candidate candidate);
 }

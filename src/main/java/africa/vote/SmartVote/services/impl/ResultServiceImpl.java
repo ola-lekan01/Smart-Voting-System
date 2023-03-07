@@ -23,4 +23,9 @@ public class ResultServiceImpl implements ResultService {
                 .getNoOfVotes() + 1);
         resultRepository.save(foundResult);
     }
+
+    @Override
+    public Result saveResult(Result result) {
+        return resultRepository.save(result);
+    }
 }

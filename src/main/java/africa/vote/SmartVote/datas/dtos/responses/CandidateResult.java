@@ -12,4 +12,5 @@ public class CandidateResult {
     private String candidateName;
     private String candidateImageURL;
     private Long candidateResult;
+    private String pollId;
 }

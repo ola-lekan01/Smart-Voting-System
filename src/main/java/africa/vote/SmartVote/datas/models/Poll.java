@@ -3,19 +3,18 @@ package africa.vote.SmartVote.datas.models;
 import africa.vote.SmartVote.datas.enums.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,7 +33,7 @@ public class Poll {
     private AppUser users;
     @Enumerated(EnumType.STRING)
     private Category category;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "poll_id", referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "candidate", referencedColumnName = "id")
     private List<Candidate>candidates;
 }
