@@ -45,11 +45,7 @@ public class SecurityConfig {
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jWTAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling()
-                .authenticationEntryPoint((req, res, exception) ->
-                        res.sendError(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED, exception.getMessage()))
-                .accessDeniedHandler((req, res, exception)
-                        -> res.sendError(HttpServletResponse.SC_FORBIDDEN, exception.getMessage()));
+                .exceptionHandling();
         return httpSecurity.build();
     }
 }
