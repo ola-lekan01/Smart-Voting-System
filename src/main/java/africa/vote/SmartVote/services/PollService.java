@@ -14,5 +14,4 @@ public interface PollService {
     CreatePollAPIData vote(String pollId, VoteRequest voteRequest);
     Poll findPollById(String pollId);
     ApiData deletePoll(String pollId);
-    CreatePollAPIData createPoll2(CreatePollRequest createPollRequest, String email);
 }

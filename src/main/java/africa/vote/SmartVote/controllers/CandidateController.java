@@ -3,6 +3,7 @@ package africa.vote.SmartVote.controllers;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.CandidateService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

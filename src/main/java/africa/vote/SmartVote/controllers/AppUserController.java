@@ -4,6 +4,7 @@ import africa.vote.SmartVote.datas.dtos.requests.UpdateUserRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping("/api/v1/welcome/")
+@ToString
 public class AppUserController {
 
     public final UserService userService;

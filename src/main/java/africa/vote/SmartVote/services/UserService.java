@@ -20,7 +20,6 @@ public interface UserService {
     Optional<AppUser> getById(String userId);
     String getUserName();
     ApiData deleteUser();
-    void tokenUpdatedForDeletedUser();
     ApiData updateAppUser(UpdateUserRequest userRequest);
 }
 
