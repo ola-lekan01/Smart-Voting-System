@@ -1,9 +1,11 @@
 package africa.vote.SmartVote.controllers;
 
+import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.dtos.requests.LoginRequest;
 import africa.vote.SmartVote.datas.dtos.requests.ResendTokenRequest;
 import africa.vote.SmartVote.datas.dtos.requests.TokenRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
+import africa.vote.SmartVote.services.PollService;
 import africa.vote.SmartVote.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,10 +21,30 @@ import java.time.ZonedDateTime;
 public class UserController {
 
     public final UserService userService;
+    private final PollService pollService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService,
+                          PollService pollService) {
         this.userService = userService;
+        this.pollService = pollService;
+    }
+
+
+    @PostMapping("create-poll/{email}")
+    public ResponseEntity<?> createPoll(@PathVariable ("email" )String email, @Valid @RequestBody CreatePollRequest createPollRequest,
+                                        HttpServletRequest request) {
+
+        var data = pollService.createPoll2(createPollRequest, email);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .data(data)
+                .timestamp(ZonedDateTime.now())
+                .path(request.getRequestURI())
+                .isSuccessful(true)
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("create")
