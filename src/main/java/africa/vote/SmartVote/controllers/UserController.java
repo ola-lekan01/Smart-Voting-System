@@ -21,31 +21,11 @@ import java.time.ZonedDateTime;
 public class UserController {
 
     public final UserService userService;
-    private final PollService pollService;
 
     @Autowired
-    public UserController(UserService userService,
-                          PollService pollService) {
-        this.userService = userService;
-        this.pollService = pollService;
-    }
+    public UserController(UserService userService) {
+        this.userService = userService;}
 
-
-    @PostMapping("create-poll/{email}")
-    public ResponseEntity<?> createPoll(@PathVariable ("email" )String email, @Valid @RequestBody CreatePollRequest createPollRequest,
-                                        HttpServletRequest request) {
-
-        var data = pollService.createPoll2(createPollRequest, email);
-        ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.OK)
-                .data(data)
-                .timestamp(ZonedDateTime.now())
-                .path(request.getRequestURI())
-                .isSuccessful(true)
-                .build();
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
-    }
 
     @PostMapping("create")
     public ResponseEntity<?> createUser(@Valid @RequestBody TokenRequest tokenRequest,
@@ -107,5 +87,4 @@ public class UserController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
-
 }

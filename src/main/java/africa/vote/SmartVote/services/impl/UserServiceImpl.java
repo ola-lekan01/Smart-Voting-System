@@ -158,24 +158,16 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
         userRepository.delete(foundUser);
         return ApiData.builder()
-                .data("AppUser Deleted Successfully")
+                .data(userEmail + " deleted Successfully")
                 .build();
     }
 
 
     @Override
-    public void tokenUpdatedForDeletedUser() {
-        String userEmail = getUserName();
-        AppUser appUserId = tokenRepository.findByAppUserId(userEmail).get().getAppUser();
-        System.out.println(appUserId);
-        tokenRepository.updateTokenForDeletedUnverifiedUsers(appUserId);
-    }
-
-    @Override
     public ApiData updateAppUser(UpdateUserRequest userRequest) {
         var userEmail = getUserName();
         var foundUser = findByEmailIgnoreCase(userEmail)
-                .orElseThrow(()-> new GenericException("AppUser Not found"));
+                .orElseThrow(()-> new GenericException(userEmail + " not found"));
 
         if(userRequest.getFirstName() != null) foundUser.setFirstName(userRequest.getFirstName());
         if(userRequest.getLastName() != null) foundUser.setLastName(userRequest.getLastName());

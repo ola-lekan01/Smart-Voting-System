@@ -34,6 +34,8 @@ public class SecurityConfig {
         httpSecurity
                 .csrf()
                 .disable()
+                .cors()
+                .and()
                 .authorizeHttpRequests()
                 .requestMatchers(AUTH_WHITELIST)
                 .permitAll()

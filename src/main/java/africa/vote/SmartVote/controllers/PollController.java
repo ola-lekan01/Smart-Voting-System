@@ -6,6 +6,7 @@ import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.PollService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
