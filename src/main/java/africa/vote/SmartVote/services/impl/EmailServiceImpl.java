@@ -1,5 +1,6 @@
 package africa.vote.SmartVote.services.impl;
 
+import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -27,15 +28,11 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage, "utf-8");
             mimeMessageHelper.setSubject("[Smart System] Email Address Confirmation...");
             mimeMessageHelper.setTo(receiverMail);
-            mimeMessageHelper.setFrom("adulojujames457@gmail.com");
+            mimeMessageHelper.setFrom("lekan.sofuyi01@gmail.com");
             mimeMessageHelper.setText(email, true);
             javaMailSender.send(mailMessage);
-        } catch (MessagingException ex) {
-            log.info("Problem: " + ex.getMessage());
-            throw new RuntimeException();
-        } catch (MailException ex) {
-            log.info("Problem: " + ex.getMessage());
-            throw new RuntimeException(ex);
+        } catch (MessagingException | MailException exception) {
+            throw new GenericException(exception.getMessage());
         }
     }
 }

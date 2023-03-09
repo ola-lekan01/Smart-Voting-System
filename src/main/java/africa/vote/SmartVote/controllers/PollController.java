@@ -4,9 +4,9 @@ import africa.vote.SmartVote.datas.dtos.requests.CreatePollRequest;
 import africa.vote.SmartVote.datas.dtos.requests.VoteRequest;
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.PollService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +25,7 @@ public class PollController {
     }
 
     @PostMapping("create")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<?> createPoll(@Valid @RequestBody CreatePollRequest createPollRequest,
                                         HttpServletRequest request) {
 
@@ -41,7 +42,7 @@ public class PollController {
     }
 
     @GetMapping("active")
-
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<?> activePolls(HttpServletRequest request) {
         var data = pollService.activePolls();
         ApiResponse apiResponse = ApiResponse.builder()
@@ -55,6 +56,8 @@ public class PollController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @GetMapping("recent")
+    @SecurityRequirement(name = "BearerAuth")
+
     public ResponseEntity<?> recentPolls(HttpServletRequest request) {
         var data = pollService.recentPolls();
         ApiResponse apiResponse = ApiResponse.builder()
@@ -68,6 +71,7 @@ public class PollController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @PutMapping("vote/{poll_id}")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<?> vote(@PathVariable("poll_id") String pollId,
                                   @Valid @RequestBody VoteRequest voteRequest,
                                   HttpServletRequest request) {
@@ -85,6 +89,7 @@ public class PollController {
     }
 
     @DeleteMapping("vote/{poll_id}")
+    @SecurityRequirement(name = "BearerAuth")
     public ResponseEntity<?> delete(@PathVariable("poll_id") String pollId,
                                   HttpServletRequest request) {
 
