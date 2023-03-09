@@ -1,7 +1,6 @@
 package africa.vote.SmartVote.security.applicationconfig;
 
 import africa.vote.SmartVote.security.config.JWTAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

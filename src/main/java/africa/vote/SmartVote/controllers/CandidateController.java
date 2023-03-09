@@ -2,6 +2,7 @@ package africa.vote.SmartVote.controllers;
 
 import africa.vote.SmartVote.datas.dtos.responses.ApiResponse;
 import africa.vote.SmartVote.services.CandidateService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class CandidateController {
     }
 
     @GetMapping("results/{pollId}")
+    @SecurityRequirement(name = "BearerAuth")
+
     public ResponseEntity<?> candidatesResult(@PathVariable("pollId") String pollId, HttpServletRequest request) {
         var data = candidateService.findAllCandidatesResultOfAPoll(pollId);
         ApiResponse apiResponse = ApiResponse.builder()

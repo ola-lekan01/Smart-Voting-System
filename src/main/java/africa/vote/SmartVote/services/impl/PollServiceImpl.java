@@ -22,7 +22,6 @@ import java.util.List;
 
 import static africa.vote.SmartVote.datas.enums.Status.*;
 
-
 @Service
 public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
@@ -106,7 +105,6 @@ public class PollServiceImpl implements PollService {
                 .filter(poll -> poll
                         .getEndDateTime()
                         .isBefore(LocalDateTime.now())
-//                        && poll.getCategory().equals(foundUser.getCategory())
                 )
                 .toList();
 
@@ -155,8 +153,8 @@ public class PollServiceImpl implements PollService {
                 || poll
                         .getStartDateTime()
                         .isBefore(LocalDateTime.now()))
-//                && poll.getCategory()
-//                        .equals(foundUser.getCategory())
+                && poll.getCategory()
+                        .equals(foundUser.getCategory())
                 && poll.
                         getEndDateTime()
                         .isAfter(LocalDateTime.now()))
@@ -199,7 +197,7 @@ public class PollServiceImpl implements PollService {
 
         if (!foundPoll.getCandidates().contains(candidateService.findById(
                 voteRequest.getCandidateId()
-        ))) throw new GenericException("Candidate doesnt belong to this poll");
+        ))) throw new GenericException("Candidate does not belong to this poll");
 
         for (Vote vote: voteService.findAllVotes()) {
             boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getAppUsers().contains(foundUser) && vote.isVoted();
