@@ -142,6 +142,7 @@ public class PollServiceImpl implements PollService {
         List<CandidateResponse> candidateList;
 
         var userEmail = userService.getUserName();
+
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
 
@@ -173,6 +174,7 @@ public class PollServiceImpl implements PollService {
 
             Poll foundCandidatePoll = pollRepository.findById(poll.getId())
                     .orElseThrow(() -> new GenericException("Invalid Polls"));
+
             for (Candidate candidate : foundCandidatePoll.getCandidates()) {
                 CandidateResponse candidateResponse = CandidateResponse.builder()
                         .candidateName(candidate.getName())
