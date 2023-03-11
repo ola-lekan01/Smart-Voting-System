@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,8 @@ public class PollServiceImpl implements PollService {
     private final ResultService resultService;
     private final VoteService voteService;
     private final CandidateService candidateService;
+
+    private final ZoneId zone = ZoneId.of("GMT+1");
 
     @Autowired
     public PollServiceImpl(PollRepository pollRepository,
@@ -44,7 +47,9 @@ public class PollServiceImpl implements PollService {
     }
 
     @Override
+    @Transactional
     public CreatePollAPIData createPoll(CreatePollRequest createPollRequest) {
+
         List<Candidate> candidateLists = new ArrayList<>();
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
@@ -52,8 +57,16 @@ public class PollServiceImpl implements PollService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 //       "2023-04-01 08:00:00 24hrs"
-        LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest.getStartDateTime(), formatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest.getEndDateTime(), formatter);
+        LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest
+                .getStartDateTime(), formatter).atZone(zone).toLocalDateTime();
+
+        LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest
+                .getEndDateTime(), formatter).atZone(zone).toLocalDateTime();
+
+        if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
+        if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
+        if (endDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll End date/time cant be before current date/time");
+
 
         //Building Candidates from Poll Request
         for (int i = 0; i <= createPollRequest.getCandidates().size() - 1; i++) {
@@ -69,9 +82,6 @@ public class PollServiceImpl implements PollService {
             candidateLists.add(savedCandidate);
         }
 
-        if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
-        if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
-        if (endDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll End date/time cant be before current date/time");
 
         Poll poll = Poll.builder()
                 .title(createPollRequest.getTitle())
@@ -92,6 +102,7 @@ public class PollServiceImpl implements PollService {
     }
 
     @Override
+
     public List<RecentPoll> recentPolls() {
         List<RecentPoll> recentPolls = new ArrayList<>();
         List<CandidateResult> candidateResults;
@@ -104,7 +115,8 @@ public class PollServiceImpl implements PollService {
                 .stream()
                 .filter(poll -> poll
                         .getEndDateTime()
-                        .isBefore(LocalDateTime.now())
+                        .isBefore(LocalDateTime.now()
+                                .atZone(zone).toLocalDateTime())
                 )
                 .toList();
 
@@ -150,15 +162,15 @@ public class PollServiceImpl implements PollService {
                 .stream()
                 .filter(poll -> (poll
                         .getStartDateTime()
-                        .equals(LocalDateTime.now())
+                        .equals(LocalDateTime.now().atZone(zone).toLocalDateTime())
                 || poll
                         .getStartDateTime()
-                        .isBefore(LocalDateTime.now()))
+                        .isBefore(LocalDateTime.now().atZone(zone).toLocalDateTime()))
                 && poll.getCategory()
                         .equals(foundUser.getCategory())
                 && poll.
                         getEndDateTime()
-                        .isAfter(LocalDateTime.now()))
+                        .isAfter(LocalDateTime.now().atZone(zone).toLocalDateTime()))
                 .toList();
 
         for (Poll poll : foundPolls) {
@@ -202,7 +214,9 @@ public class PollServiceImpl implements PollService {
         ))) throw new GenericException("Candidate does not belong to this poll");
 
         for (Vote vote: voteService.findAllVotes()) {
-            boolean votedBefore = vote.getPolls().contains(foundPoll) && vote.getAppUsers().contains(foundUser) && vote.isVoted();
+            boolean votedBefore = vote.getPolls().contains(foundPoll) &&
+                    vote.getAppUsers().contains(foundUser)
+                    && vote.isVoted();
             if (votedBefore)throw new GenericException("You can't vote twice");
         }
         List<Candidate> foundPollCandidates = foundPoll.getCandidates();
