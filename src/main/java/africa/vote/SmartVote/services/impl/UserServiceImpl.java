@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
         );
 
         var foundUser = findByEmailIgnoreCase(request.getEmail())
-                .orElseThrow(()-> new GenericException("Uer does not Exist"));
+                .orElseThrow(()-> new GenericException("User does not Exist"));
 
         return LoginData.builder()
                 .token(jwtService.generateToken(foundUser))

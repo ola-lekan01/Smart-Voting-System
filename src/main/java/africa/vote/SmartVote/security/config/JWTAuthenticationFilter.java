@@ -1,8 +1,7 @@
 package africa.vote.SmartVote.security.config;
 
 import africa.vote.SmartVote.exeptions.GenericException;
-import africa.vote.SmartVote.exeptions.JwtException;
-import africa.vote.SmartVote.exeptions.UsernameNotFoundException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +34,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader == null || !authHeader.startsWith("Bearer ")){
             try {
                 filterChain.doFilter(request, response);
-            } catch (IOException | ServletException | JwtException exception) {
+            } catch (IOException | ServletException exception) {
                 throw new GenericException(exception.getMessage());
             }
             return;
@@ -59,12 +58,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-        } catch (UsernameNotFoundException | JwtException exception) {
+        } catch (SignatureException exception) {
             throw new GenericException(exception.getMessage());
         }
         try {
             filterChain.doFilter(request,response);
-        } catch (IOException | ServletException exception) {
+        } catch (IOException | ServletException  exception) {
             throw new GenericException(exception.getMessage());
         }
     }

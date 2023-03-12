@@ -18,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JWTAuthenticationFilter jWTAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final JwtAccessDeniedHandler accessDeniedHandler;
+
     private static final String[] AUTH_WHITELIST = {
             "/authenticate",
             "/swagger-resources/**",
@@ -31,9 +34,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .cors()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .csrf()
                 .disable()
-                .cors()
+                .exceptionHandling()
+                .authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(AUTH_WHITELIST)
@@ -41,12 +50,10 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jWTAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling();
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler);
         return httpSecurity.build();
     }
 }

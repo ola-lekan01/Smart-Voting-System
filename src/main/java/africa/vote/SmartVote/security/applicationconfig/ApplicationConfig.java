@@ -2,7 +2,6 @@ package africa.vote.SmartVote.security.applicationconfig;
 
 import africa.vote.SmartVote.datas.repositories.UserRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
-import africa.vote.SmartVote.exeptions.UsernameNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +23,7 @@ public class ApplicationConfig {
         return username -> userRepository
                 .findByEmailIgnoreCase(username)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("AppUser Not found"));
+                        new GenericException("User Not found"));
     }
     @Bean
     public AuthenticationProvider authenticationProvider(){
@@ -37,8 +36,10 @@ public class ApplicationConfig {
     @Bean
     public AuthenticationManager authenticationManager
             (AuthenticationConfiguration authConfig) {
-        try {return authConfig.getAuthenticationManager();
-        } catch (Exception exception) {
+        try {
+            return authConfig.getAuthenticationManager();
+        }
+        catch (Exception exception) {
             throw new GenericException(exception.getMessage());
         }
     }
