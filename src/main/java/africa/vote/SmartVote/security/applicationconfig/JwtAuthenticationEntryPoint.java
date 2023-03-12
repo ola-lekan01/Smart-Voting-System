@@ -30,7 +30,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         Map<String, Object> data = new HashMap<>();
         data.put("Status", false);
-        data.put("Date", formattedDatetime);
+        data.put("Date Stamp", formattedDatetime);
         data.put("Message", exception.getMessage());
         response.getOutputStream().println(objectMapper.writeValueAsString(data));
     }

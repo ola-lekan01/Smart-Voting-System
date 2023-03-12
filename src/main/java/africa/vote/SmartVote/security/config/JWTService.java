@@ -57,7 +57,13 @@ public class JWTService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
-        return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        boolean isValid;
+        try {
+            isValid = userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (SignatureException exception) {
+            throw new SignatureException(exception.getMessage());
+        }
+        return isValid;
     }
 
     private boolean isTokenExpired(String token) {
@@ -65,22 +71,26 @@ public class JWTService {
     }
 
     private Date extractExpiration(String token) {
-        var expirationDate = extractClaim(token, Claims::getExpiration);
-        if(expirationDate.before(new Date())) throw new GenericException("JWT Token Expired");
-        return expirationDate;
+        return extractClaim(token, Claims::getExpiration);
     }
 
-    private <T> T extractClaim (String token, Function<Claims, T>
-            claimsResolver){
-        final Claims claims = extractAllClaims(token);
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+       Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Claims extractAllClaims(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+
+    public Claims extractAllClaims(String token) {
+        Claims resolvedClaims;
+        try {
+            resolvedClaims = Jwts.parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException exception) {
+            throw new SignatureException(exception.getMessage());
+        }
+        return resolvedClaims;
     }
 
     private Key getSignInKey() {
