@@ -55,13 +55,14 @@ public class PollServiceImpl implements PollService {
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        ZoneId timeZone = ZoneId.of("UTC");
 
 //       "2023-04-01 08:00:00 24hrs"
         LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest
-                .getStartDateTime(), formatter).atZone(zone).toLocalDateTime();
+                .getStartDateTime(), formatter).atZone(timeZone).toLocalDateTime();
 
         LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest
-                .getEndDateTime(), formatter).atZone(zone).toLocalDateTime();
+                .getEndDateTime(), formatter).atZone(timeZone).toLocalDateTime();
 
         if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
         if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
