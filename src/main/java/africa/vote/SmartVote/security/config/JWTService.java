@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -37,13 +38,22 @@ public class JWTService {
 
     public String generateToken(Map<String, Object> extraClaims,
                                 UserDetails userDetails){
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 300))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+        String compact;
+        try {
+            compact = Jwts.builder()
+                    .setClaims(extraClaims)
+                    .setSubject(userDetails.getUsername())
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    //JSON Token Expires in 5hours
+                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 300))
+                    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                    .compact();
+
+        }
+        catch (SignatureException exception){
+            throw new GenericException(exception.getMessage());
+        }
+        return compact;
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
