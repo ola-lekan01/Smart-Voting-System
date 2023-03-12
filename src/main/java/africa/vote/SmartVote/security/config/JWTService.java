@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -37,17 +38,32 @@ public class JWTService {
 
     public String generateToken(Map<String, Object> extraClaims,
                                 UserDetails userDetails){
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 300))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+        String compact;
+        try {
+            compact = Jwts.builder()
+                    .setClaims(extraClaims)
+                    .setSubject(userDetails.getUsername())
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    //JSON Token Expires in 5hours
+                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 300))
+                    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                    .compact();
+
+        }
+        catch (SignatureException exception){
+            throw new GenericException(exception.getMessage());
+        }
+        return compact;
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
-        return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        boolean isValid;
+        try {
+            isValid = userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (SignatureException exception) {
+            throw new SignatureException(exception.getMessage());
+        }
+        return isValid;
     }
 
     private boolean isTokenExpired(String token) {
@@ -55,22 +71,26 @@ public class JWTService {
     }
 
     private Date extractExpiration(String token) {
-        var expirationDate = extractClaim(token, Claims::getExpiration);
-        if(expirationDate.before(new Date())) throw new GenericException("JWT Token Expired");
-        return expirationDate;
+        return extractClaim(token, Claims::getExpiration);
     }
 
-    private <T> T extractClaim (String token, Function<Claims, T>
-            claimsResolver){
-        final Claims claims = extractAllClaims(token);
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+       Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Claims extractAllClaims(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+
+    public Claims extractAllClaims(String token) {
+        Claims resolvedClaims;
+        try {
+            resolvedClaims = Jwts.parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException exception) {
+            throw new SignatureException(exception.getMessage());
+        }
+        return resolvedClaims;
     }
 
     private Key getSignInKey() {

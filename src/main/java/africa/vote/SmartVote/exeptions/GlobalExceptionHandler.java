@@ -24,44 +24,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<?> handleIOException(IOException exception,
-                                               HttpServletRequest httpServletRequest){
-        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
-                .isSuccessful(false)
-                .data(exception.getMessage())
-                .statusCode(HttpStatus.BAD_GATEWAY)
-                .path(httpServletRequest.getRequestURI())
-                .timeStamp(ZonedDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<?> userNameNotFoundException(UsernameNotFoundException exception,
-                                               HttpServletRequest httpServletRequest){
-        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
-                .isSuccessful(false)
-                .data(exception.getMessage())
-                .statusCode(HttpStatus.BAD_REQUEST)
-                .path(httpServletRequest.getRequestURI())
-                .timeStamp(ZonedDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-    @ExceptionHandler(ServletException.class)
-    public ResponseEntity<?> servletExceptionException(ServletException exception,
-                                                       HttpServletRequest httpServletRequest){
-        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
-                .isSuccessful(false)
-                .data(exception.getMessage())
-                .statusCode(HttpStatus.BAD_REQUEST)
-                .path(httpServletRequest.getRequestURI())
-                .timeStamp(ZonedDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<?> jwtException(JwtException exception,
                                                        HttpServletRequest httpServletRequest){
@@ -73,18 +35,5 @@ public class GlobalExceptionHandler {
                 .timeStamp(ZonedDateTime.now())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> exception(Exception exception,
-                                          HttpServletRequest httpServletRequest){
-        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
-                .isSuccessful(false)
-                .data(exception.getMessage())
-                .statusCode(HttpStatus.BAD_REQUEST)
-                .path(httpServletRequest.getRequestURI())
-                .timeStamp(ZonedDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

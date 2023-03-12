@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @RestController
@@ -81,6 +83,19 @@ public class UserController {
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.ACCEPTED)
                 .data(data)
+                .timestamp(ZonedDateTime.now())
+                .path(httpServletRequest.getRequestURI())
+                .isSuccessful(true)
+                .build();
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
+    @GetMapping("time")
+    public ResponseEntity<?> time(HttpServletRequest httpServletRequest){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED)
+                .data(LocalDateTime.now().atZone(ZoneId.of("GMT+5")).toLocalDateTime())
                 .timestamp(ZonedDateTime.now())
                 .path(httpServletRequest.getRequestURI())
                 .isSuccessful(true)
