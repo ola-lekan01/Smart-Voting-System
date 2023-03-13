@@ -6,35 +6,28 @@ import africa.vote.SmartVote.datas.repositories.CandidateRepository;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.CandidateService;
+import africa.vote.SmartVote.services.PollService;
 import africa.vote.SmartVote.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
-
+@RequiredArgsConstructor
 public class CandidateServiceImpl implements CandidateService {
 
-    private final PollRepository pollRepository;
     private final CandidateRepository candidateRepository;
     private final UserService userService;
-    public CandidateServiceImpl(PollRepository pollRepository,
-                                CandidateRepository candidateRepository,
-                                UserService userService) {
-        this.pollRepository = pollRepository;
-        this.candidateRepository = candidateRepository;
-        this.userService = userService;
-    }
+    private final PollRepository pollRepository;
 
     @Override
     public List<CandidateResult> findAllCandidatesResultOfAPoll(String pollId) {
 
         var foundPoll = pollRepository.findById(pollId)
-                .orElseThrow(()-> new GenericException("Poll Id Does not Exist"));
-
+                .orElseThrow(()-> new GenericException(String.format("%s does not exist", pollId)));
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));

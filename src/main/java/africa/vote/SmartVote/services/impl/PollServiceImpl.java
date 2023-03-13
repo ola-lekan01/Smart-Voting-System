@@ -11,40 +11,26 @@ import africa.vote.SmartVote.datas.models.Vote;
 import africa.vote.SmartVote.datas.repositories.PollRepository;
 import africa.vote.SmartVote.exeptions.GenericException;
 import africa.vote.SmartVote.services.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static africa.vote.SmartVote.datas.enums.Status.*;
+import static africa.vote.SmartVote.datas.enums.Status.ACTIVE;
+import static africa.vote.SmartVote.datas.enums.Status.CLOSED;
 
 @Service
+@RequiredArgsConstructor
 public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
     private final UserService userService;
     private final ResultService resultService;
     private final VoteService voteService;
     private final CandidateService candidateService;
-
-    private final ZoneId zone = ZoneId.of("GMT+1");
-
-    @Autowired
-    public PollServiceImpl(PollRepository pollRepository,
-                           UserService userService,
-                           ResultService resultService,
-                           VoteService voteService,
-                           CandidateService candidateService) {
-        this.pollRepository = pollRepository;
-        this.userService = userService;
-        this.resultService = resultService;
-        this.voteService = voteService;
-        this.candidateService = candidateService;
-    }
 
     @Override
     @Transactional
@@ -54,20 +40,17 @@ public class PollServiceImpl implements PollService {
         var userEmail = userService.getUserName();
         var foundUser = userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
+
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        ZoneId timeZone = ZoneId.of("UTC");
 
-//       "2023-04-01 08:00:00 24hrs"
-        LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest
-                .getStartDateTime(), formatter).atZone(timeZone).toLocalDateTime();
+        //       "2023-04-01 08:00:00 24hrs"
+        LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest.getStartDateTime(), formatter);// user-specified time in GMT+1
+        LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest.getEndDateTime(), formatter);
 
-        LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest
-                .getEndDateTime(), formatter).atZone(timeZone).toLocalDateTime();
-
-        if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
+        if (startDateTime.isBefore(endDateTime))throw new GenericException("End date/time cant be before start date/time");
         if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
         if (endDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll End date/time cant be before current date/time");
-
 
         //Building Candidates from Poll Request
         for (int i = 0; i <= createPollRequest.getCandidates().size() - 1; i++) {
@@ -109,15 +92,14 @@ public class PollServiceImpl implements PollService {
         List<CandidateResult> candidateResults;
 
         var userEmail = userService.getUserName();
-        var foundUser = userService.findByEmailIgnoreCase(userEmail)
+        userService.findByEmailIgnoreCase(userEmail)
                 .orElseThrow(()-> new GenericException("AppUser Not found"));
 
         var foundPolls =  pollRepository.findAll()
                 .stream()
                 .filter(poll -> poll
                         .getEndDateTime()
-                        .isBefore(LocalDateTime.now()
-                                .atZone(zone).toLocalDateTime())
+                        .isBefore(LocalDateTime.now())
                 )
                 .toList();
 
@@ -161,17 +143,11 @@ public class PollServiceImpl implements PollService {
 
         var foundPolls = pollRepository.findAll()
                 .stream()
-                .filter(poll -> (poll
-                        .getStartDateTime()
-                        .equals(LocalDateTime.now().atZone(zone).toLocalDateTime())
-                || poll
-                        .getStartDateTime()
-                        .isBefore(LocalDateTime.now().atZone(zone).toLocalDateTime()))
-                && poll.getCategory()
-                        .equals(foundUser.getCategory())
-                && poll.
-                        getEndDateTime()
-                        .isAfter(LocalDateTime.now().atZone(zone).toLocalDateTime()))
+                .filter(poll -> (
+                        poll.getStartDateTime().equals(LocalDateTime.now()) ||
+                                poll.getStartDateTime().isBefore(LocalDateTime.now()))
+                                && poll.getCategory().equals(foundUser.getCategory())
+                                && poll.getEndDateTime().isAfter(LocalDateTime.now()))
                 .toList();
 
         for (Poll poll : foundPolls) {
