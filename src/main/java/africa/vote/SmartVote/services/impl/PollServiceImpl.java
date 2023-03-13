@@ -59,10 +59,10 @@ public class PollServiceImpl implements PollService {
 
 //       "2023-04-01 08:00:00 24hrs"
         LocalDateTime startDateTime = LocalDateTime.parse(createPollRequest
-                .getStartDateTime(), formatter).atZone(timeZone).toLocalDateTime();
+                .getStartDateTime(), formatter).atZone(zone).toLocalDateTime().minusHours(1);
 
         LocalDateTime endDateTime = LocalDateTime.parse(createPollRequest
-                .getEndDateTime(), formatter).atZone(timeZone).toLocalDateTime();
+                .getEndDateTime(), formatter).atZone(zone).toLocalDateTime().minusHours(1);
 
         if (endDateTime.isBefore(startDateTime))throw new GenericException("End date/time cant be before start date/time");
         if (startDateTime.isBefore(LocalDateTime.now()))throw new GenericException("Poll start date/time cant be before current date/time");
